@@ -19,8 +19,11 @@ class SiswaController extends Controller
     $logs = LogAktivitas::where('nis', session('nis'))->orderBy('created_at', 'desc')->get();
     $kategori = Kategori::all();
 
-    // AMBIL RIWAYAT LAPORAN SISWA INI
-    $pengaduan = InputAspirasi::where('nis', session('nis'))->orderBy('created_at', 'desc')->get();
+        // TAMBAHKAN with('aspirasi') DI SINI
+    $pengaduan = InputAspirasi::with('aspirasi')
+                ->where('nis', session('nis'))
+                ->orderBy('created_at', 'desc')
+                ->get();
 
     return view('siswa.dashboard', compact('siswa', 'logs', 'kategori', 'pengaduan'));
 }

@@ -17,4 +17,10 @@ class InputAspirasi extends Model
     public function kategori() {
         return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
     }
+
+    public function aspirasi()
+    {
+        // Kita hubungkan id_pelaporan dengan id_aspirasi di tabel aspirasi
+        return $this->hasOne(Aspirasi::class, 'id_aspirasi', 'id_pelaporan');
+    }
 }

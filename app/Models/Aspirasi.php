@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Aspirasi; // Tambahkan di atas
+
+class Aspirasi extends Model
+{
+    protected $table = 'aspirasi';
+    protected $primaryKey = 'id_aspirasi';
+    protected $fillable = ['id_aspirasi', 'status', 'id_kategori', 'feedback'];
+    // Catatan: Di ERD kamu id_aspirasi tidak auto-increment, tapi biasanya id_aspirasi 
+    // akan merujuk ke id_pelaporan agar kita tahu laporan mana yang ditanggapi.
+
+    public function tanggapi(Request $request) {
+        $request->validate([
+            'id_pelaporan' => 'required',
+            'status' => 'required',
+            'feedback' => 'required'
+        ]);
+
+        // Kita simpan ke tabel aspirasi
+        // Kita gunakan id_pelaporan sebagai id_aspirasi agar sinkron
+        Aspirasi::updateOrCreate(
+            ['id_aspirasi' => $request->id_pelaporan], // Cari kalau sudah ada
+            [
+                'status' => $request->status,
+                'id_kategori' => $request->id_kategori,
+                'feedback' => $request->feedback
+            ]
+        );
+
+        return back()->with('success', 'Berhasil memberikan tanggapan!');
+    }
+}

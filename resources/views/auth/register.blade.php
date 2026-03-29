@@ -25,6 +25,7 @@
                 </div>
 
                 <div class="card p-4 shadow">
+                    <!-- PERHATIKAN BARIS DI BAWAH INI: SUDAH SAYA TAMBAHKAN enctype -->
                     <form action="{{ url('/register') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
@@ -38,22 +39,26 @@
                                 <input type="text" name="kelas" class="form-control" value="{{ old('kelas') }}" placeholder="XII RPL 1" required>
                             </div>
                         </div>
-                        <!-- Tambahkan input Foto Profile di bawah Kelas atau Nama -->
+
                         <div class="mb-3">
                             <label class="form-label text-muted-dark">Foto Profil</label>
+                            <!-- Pastikan name-nya "foto_profile" -->
                             <input type="file" name="foto_profile" class="form-control @error('foto_profile') is-invalid @enderror">
-                            <small class="text-muted-dark">Format: JPG, PNG, JPEG (Maks 2MB)</small>
+                            <small class="text-muted-dark">Pilih foto apa saja (JPG/PNG)</small>
                             @error('foto_profile') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label text-muted-dark">Nama Lengkap</label>
                             <input type="text" name="nama" class="form-control" value="{{ old('nama') }}" placeholder="Nama sesuai absen" required>
                         </div>
+
                         <div class="mb-4">
                             <label class="form-label text-muted-dark">Password</label>
-                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Minimal 6 karakter" required>
+                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Minimal 3 karakter" required>
                             @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+
                         <button type="submit" class="btn btn-primary w-100 mb-3">Daftar Sekarang</button>
                         <div class="text-center">
                             <small class="text-muted-dark">Sudah punya akun? <a href="{{ url('/login') }}">Login di sini</a></small>

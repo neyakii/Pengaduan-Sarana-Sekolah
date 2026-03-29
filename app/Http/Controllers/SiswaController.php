@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Siswa;
+use App\Models\Kategori;
+use App\Models\LogAktivitas;
+use App\Models\InputAspirasi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+
+class SiswaController extends Controller
+{
+    public function dashboard() 
+    {
+    if (!Session::has('login_siswa')) return redirect('/login');
+    
+    $siswa = Siswa::where('nis', session('nis'))->first();
+    $logs = LogAktivitas::where('nis', session('nis'))->orderBy('created_at', 'desc')->get();
+    $kategori = Kategori::all();
+
+    // AMBIL RIWAYAT LAPORAN SISWA INI
+    $pengaduan = InputAspirasi::where('nis', session('nis'))->orderBy('created_at', 'desc')->get();
+
+    return view('siswa.dashboard', compact('siswa', 'logs', 'kategori', 'pengaduan'));
+}
+
+    public function simpanAspirasi(Request $request) 
+    {
+        $request->validate(['id_kategori' => 'required', 'lokasi' => 'required', 'ket' => 'required', 'foto_kerusakan' => 'required|image']);
+
+        if ($request->hasFile('foto_kerusakan')) {
+            $file = $request->file('foto_kerusakan');
+            $nama_foto = time() . '_' . session('nis') . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('storage/aspirasi'), $nama_foto);
+            
+            InputAspirasi::create([
+                'nis' => session('nis'),
+                'id_kategori' => $request->id_kategori,
+                'lokasi' => $request->lokasi,
+                'ket' => $request->ket,
+                'foto' => 'aspirasi/' . $nama_foto
+            ]);
+
+            LogAktivitas::create(['nis' => session('nis'), 'aktivitas' => 'Mengirim laporan pengaduan baru']);
+
+            return back()->with('success', 'Laporan berhasil dikirim!');
+        }
+    }
+}

@@ -26,7 +26,14 @@ class SiswaController extends Controller
                 ->get();
 
     return view('siswa.dashboard', compact('siswa', 'logs', 'kategori', 'pengaduan'));
-}
+    }
+
+    // Contoh logic di Controller
+    public function updateFoto(Request $request) {
+        $request->validate(['foto_profile' => 'required|image|mimes:jpeg,png,jpg|max:2048']);
+        // Logic simpan file dan update DB...
+        return back()->with('success', 'Foto profil berhasil diperbarui!');
+    }
 
     public function simpanAspirasi(Request $request) 
     {

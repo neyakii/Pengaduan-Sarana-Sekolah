@@ -131,7 +131,7 @@
                 <p class="text-secondary">Dashboard pemantauan fasilitas • <span class="text-white fw-bold">{{ session('username') }}</span></p>
             </div>
             <div class="col-md-4 text-md-end">
-                <a href="/logout" class="btn btn-outline-danger border-0 px-4">LogOut</a>
+                <a href="/logout" class="btn btn-outline-danger border-0 px-4">Logout</a>
             </div>
         </div>
 

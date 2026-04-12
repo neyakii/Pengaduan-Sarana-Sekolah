@@ -79,6 +79,11 @@
         .form-control[type="file"] {
             padding: 10px;
         }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7) !important; /* Putih agak transparan agar elegan */
+            opacity: 1; /* Penting untuk Firefox */
+        }
         .form-control[type="file"]::file-selector-button {
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa;
@@ -160,7 +165,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">NIS</label>
-                                <input type="text" name="nis" class="form-control @error('nis') is-invalid @enderror" value="{{ old('nis') }}" placeholder="Contoh: 1220..." required>
+                                <input type="text" name="nis" class="form-control @error('nis') is-invalid @enderror" value="{{ old('nis') }}" placeholder="Contoh: 1220" required>
                                 @error('nis') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6 mb-3">

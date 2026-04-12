@@ -29,10 +29,31 @@ class SiswaController extends Controller
     }
 
     // Contoh logic di Controller
-    public function updateFoto(Request $request) {
-        $request->validate(['foto_profile' => 'required|image|mimes:jpeg,png,jpg|max:2048']);
-        // Logic simpan file dan update DB...
-        return back()->with('success', 'Foto profil berhasil diperbarui!');
+    public function updateFoto(Request $request) 
+    {
+        $request->validate([
+            'foto_profile' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        if ($request->hasFile('foto_profile')) {
+            // Simpan file ke folder storage/app/public/profile_siswa
+            $path = $request->file('foto_profile')->store('profile_siswa', 'public');
+            
+            // Update database (Pastikan kolom foto_profile ada di tabel siswas)
+            Siswa::where('nis', session('nis'))->update([
+                'foto_profile' => $path
+            ]);
+
+            // Catat di log
+            LogAktivitas::create([
+                'nis' => session('nis'), 
+                'aktivitas' => 'Memperbarui foto profil'
+            ]);
+            
+            return back()->with('success', 'Foto profil berhasil diperbarui!');
+        }
+
+        return back()->with('error', 'Gagal mengunggah foto.');
     }
 
     public function simpanAspirasi(Request $request) 

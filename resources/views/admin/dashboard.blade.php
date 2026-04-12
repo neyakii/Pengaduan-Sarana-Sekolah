@@ -6,277 +6,178 @@
     <title>Admin Dashboard - Pengaduan Sarana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        :root {
-            --bg-color: #050b18;
-            --card-bg: rgba(30, 41, 59, 0.45);
-            --accent-blue: #3b82f6;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: #ffffff;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
-
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 1.5rem;
-        }
-
-        /* Stat Cards */
-        .stat-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 1.25rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Table Styling */
-        .custom-table {
-            border-collapse: separate;
-            border-spacing: 0 12px;
-        }
-        .custom-table thead th {
-            border: none;
-            color: #64748b;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            padding-left: 1.5rem;
-        }
-        .custom-table tbody tr {
-            background: rgba(255, 255, 255, 0.03);
-            transition: 0.3s;
-        }
-        .custom-table tbody td {
-            border: none;
-            padding: 1.2rem 1.5rem;
-            vertical-align: middle;
-        }
-        .custom-table tbody td:first-child { border-radius: 16px 0 0 16px; }
-        .custom-table tbody td:last-child { border-radius: 0 16px 16px 0; }
-
-        /* Badge Pill */
-        .badge-pill {
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
-        .status-selesai { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
-        .status-proses { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
-        .status-menunggu { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
-
-        /* Modal FIX */
-        .modal {
-            background: rgba(5, 11, 24, 0.8);
-            backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background: #0f172a;
-            border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        .modal-header, .modal-footer { border: none; }
-
-        .img-preview {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 12px;
-        }
-
-        .btn-action {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 10px;
-            padding: 8px 16px;
-            font-weight: 600;
-        }
+        :root { --bg-color: #050b18; --card-bg: rgba(30, 41, 59, 0.45); --accent-blue: #3b82f6; }
+        body { background-color: var(--bg-color); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; }
+        .text-gradient { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 1.5rem; }
         
-        /* Log Activity */
-        .timeline { border-left: 2px solid rgba(255, 255, 255, 0.05); padding-left: 20px; }
-        .timeline-item { position: relative; margin-bottom: 20px; font-size: 0.9rem; }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -27px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent-blue);
-        }
+        /* Nav Tabs Custom */
+        .nav-pills .nav-link { color: #94a3b8; border-radius: 12px; transition: 0.3s; }
+        .nav-pills .nav-link.active { background: var(--accent-blue); color: white; }
+        
+        /* Table Styling */
+        .custom-table { border-collapse: separate; border-spacing: 0 8px; }
+        .custom-table tbody tr { background: rgba(255, 255, 255, 0.03); border-radius: 12px; }
+        .custom-table td { border: none; padding: 1rem; vertical-align: middle; }
+        .custom-table td:first-child { border-radius: 12px 0 0 12px; }
+        .custom-table td:last-child { border-radius: 0 12px 12px 0; }
+
+        .img-preview { width: 45px; height: 45px; object-fit: cover; border-radius: 10px; }
+        .status-badge { padding: 5px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
+        .modal-content { background: #0f172a; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
+        .form-control, .form-select { background: #1e293b; border: 1px solid #334155; color: white; }
+        .form-control:focus { background: #1e293b; color: white; border-color: var(--accent-blue); }
     </style>
 </head>
 <body>
-    <div class="container py-5">
+    <div class="container py-4">
         <!-- HEADER -->
-        <div class="row align-items-center mb-5">
-            <div class="col-md-8">
-                <h2 class="fw-800 mb-1">Pusat Kendali <span class="text-gradient">Admin</span></h2>
-                <p class="text-secondary">Dashboard pemantauan fasilitas • <span class="text-white fw-bold">{{ session('username') }}</span></p>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-800 mb-0">Pusat <span class="text-gradient">Kendali</span></h3>
+                <p class="text-secondary small mb-0">Admin: {{ session('username') }}</p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <a href="/logout" class="btn btn-outline-danger border-0 px-4">Logout</a>
-            </div>
+            <a href="/logout" class="btn btn-sm btn-outline-danger px-3 rounded-pill">Logout</a>
         </div>
 
-        <!-- STATS SECTION -->
-        <div class="row g-4 mb-5 text-center">
-            <div class="col-6 col-md-3">
-                <div class="stat-box">
-                    <div class="text-secondary small mb-1">Total Laporan</div>
-                    <div class="h3 fw-bold mb-0 text-gradient">{{ count($laporan) }}</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-box">
-                    <div class="text-secondary small mb-1">Menunggu</div>
-                    <div class="h3 fw-bold mb-0 text-warning">
-                        {{ count(array_filter($laporan->toArray(), fn($l) => ($l['aspirasi']['status'] ?? 'Menunggu') == 'Menunggu')) }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-box">
-                    <div class="text-secondary small mb-1">Dalam Proses</div>
-                    <div class="h3 fw-bold mb-0 text-info">
-                        {{ count(array_filter($laporan->toArray(), fn($l) => ($l['aspirasi']['status'] ?? '') == 'Proses')) }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-box">
-                    <div class="text-secondary small mb-1">Selesai</div>
-                    <div class="h3 fw-bold mb-0 text-success">
-                        {{ count(array_filter($laporan->toArray(), fn($l) => ($l['aspirasi']['status'] ?? '') == 'Selesai')) }}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- NAVIGATION TABS -->
+        <ul class="nav nav-pills mb-4 gap-2" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-laporan"><i class="bi bi-chat-left-text me-2"></i>Laporan</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-kategori"><i class="bi bi-grid me-2"></i>Kategori</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-users"><i class="bi bi-people me-2"></i>Pengguna</button>
+            </li>
+        </ul>
 
-        <div class="row g-4">
-            <!-- TABEL LAPORAN -->
-            <div class="col-lg-8">
+        <div class="tab-content">
+            <!-- TAB 1: LAPORAN -->
+            <div class="tab-pane fade show active" id="tab-laporan">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="glass-card text-center p-3 small text-secondary">Total: <b class="text-white">{{ count($laporan) }}</b></div></div>
+                    <div class="col-md-3"><div class="glass-card text-center p-3 small text-secondary">Menunggu: <b class="text-warning">{{ count($laporan->where('aspirasi.status', 'Menunggu')) }}</b></div></div>
+                </div>
                 <div class="glass-card">
-                    <h5 class="fw-700 mb-4">Antrean Laporan Siswa</h5>
                     <div class="table-responsive">
-                        <table class="table custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Pelapor</th>
-                                    <th>Isi Laporan</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
+                        <table class="table custom-table text-white">
+                            <thead><tr class="text-secondary small"><th>PELAPOR</th><th>ISI LAPORAN</th><th>STATUS</th><th>AKSI</th></tr></thead>
                             <tbody>
-                                @forelse($laporan as $l)
+                                @foreach($laporan as $l)
                                 <tr>
-                                    <td>
-                                        <div class="fw-bold">{{ $l->siswa->nama ?? 'Siswa' }}</div>
-                                        <div class="small text-secondary">{{ $l->nis }}</div>
-                                    </td>
+                                    <td><div class="fw-bold small">{{ $l->siswa->nama ?? 'Siswa' }}</div><div class="text-muted" style="font-size: 0.7rem;">{{ $l->nis }}</div></td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <img src="{{ asset('storage/'.$l->foto) }}" class="img-preview">
-                                            <div class="small text-secondary">{{ Str::limit($l->ket, 30) }}</div>
+                                            <span class="small">{{ Str::limit($l->ket, 25) }}</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        @php $status = $l->aspirasi->status ?? 'Menunggu'; @endphp
-                                        <span class="badge-pill {{ $status == 'Selesai' ? 'status-selesai' : ($status == 'Proses' ? 'status-proses' : 'status-menunggu') }}">
-                                            {{ $status }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <!-- Tombol Detail -->
-                                        <button class="btn btn-action btn-sm" data-bs-toggle="modal" data-bs-target="#modalTanggapi{{ $l->id_pelaporan }}">
-                                            Detail
-                                        </button>
-                                    </td>
+                                    <td><span class="status-badge {{ $l->aspirasi->status == 'Selesai' ? 'bg-success' : ($l->aspirasi->status == 'Proses' ? 'bg-primary' : 'bg-warning') }}">{{ $l->aspirasi->status ?? 'Menunggu' }}</span></td>
+                                    <td><button class="btn btn-sm btn-info text-white rounded-3" data-bs-toggle="modal" data-bs-target="#modalTanggapi{{ $l->id_pelaporan }}">Detail</button></td>
                                 </tr>
-                                @empty
-                                <tr><td colspan="4" class="text-center py-5 text-secondary">Tidak ada laporan.</td></tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- LOG AKTIVITAS -->
-            <div class="col-lg-4">
+            <!-- TAB 2: KATEGORI (CRUD) -->
+            <div class="tab-pane fade" id="tab-kategori">
+                <div class="d-flex justify-content-between mb-3 align-items-center">
+                    <h5 class="mb-0">Manajemen Kategori</h5>
+                    <button class="btn btn-primary btn-sm rounded-3" data-bs-toggle="modal" data-bs-target="#modalAddKategori">+ Kategori</button>
+                </div>
                 <div class="glass-card">
-                    <h5 class="fw-700 mb-4">Aktivitas Terbaru</h5>
-                    <div class="timeline">
-                        @foreach($logs as $log)
-                        <div class="timeline-item">
-                            <div class="fw-bold text-white small">{{ $log->nis ?? $log->username }}</div>
-                            <div class="text-secondary" style="font-size: 0.8rem;">{{ $log->aktivitas }}</div>
-                            <div class="text-muted" style="font-size: 0.7rem;">{{ $log->created_at->diffForHumans() }}</div>
-                        </div>
-                        @endforeach
-                    </div>
+                    <table class="table custom-table text-white">
+                        <thead><tr class="text-secondary small"><th>NAMA KATEGORI</th><th class="text-end">OPSI</th></tr></thead>
+                        <tbody>
+                            @foreach($kategori as $k)
+                            <tr>
+                                <td>{{ $k->nama_kategori }}</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
+                                    <form action="{{ url('/admin/kategori/'.$k->id_kategori) }}" method="POST" class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Hapus kategori ini?')"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: USERS (CRUD) -->
+            <div class="tab-pane fade" id="tab-users">
+                <div class="d-flex justify-content-between mb-3 align-items-center">
+                    <h5 class="mb-0">Daftar Pengguna</h5>
+                    <button class="btn btn-primary btn-sm rounded-3" data-bs-toggle="modal" data-bs-target="#modalAddUser">+ Pengguna</button>
+                </div>
+                <div class="glass-card">
+                    <table class="table custom-table text-white">
+                        <thead><tr class="text-secondary small"><th>NAMA</th><th>NIS/USERNAME</th><th>ROLE</th><th class="text-end">OPSI</th></tr></thead>
+                        <tbody>
+                            @foreach($users as $u)
+                            <tr>
+                                <td>{{ $u->nama }}</td>
+                                <td>{{ $u->nis ?? $u->username }}</td>
+                                <td><span class="badge bg-secondary">{{ isset($u->nis) ? 'Siswa' : 'Admin' }}</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-light"><i class="bi bi-gear"></i></button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL SECTION (Diletakkan di luar loop tabel utama agar tidak error) -->
-    @foreach($laporan as $l)
-    <div class="modal fade" id="modalTanggapi{{ $l->id_pelaporan }}" tabindex="-1" aria-hidden="true">
+    <!-- MODAL TAMBAH KATEGORI -->
+    <div class="modal fade" id="modalAddKategori" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow-lg">
-                <div class="modal-header">
-                    <h5 class="fw-800">Tindak Lanjut</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="{{ url('/admin/tanggapi') }}" method="POST">
+            <div class="modal-content">
+                <form action="{{ url('/admin/kategori') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="id_pelaporan" value="{{ $l->id_pelaporan }}">
-                    <input type="hidden" name="id_kategori" value="{{ $l->id_kategori }}">
+                    <div class="modal-header border-0"><h5 class="fw-bold">Tambah Kategori</h5></div>
                     <div class="modal-body">
-                        <img src="{{ asset('storage/'.$l->foto) }}" class="w-100 rounded-4 mb-3 shadow">
-                        <div class="mb-3">
-                            <label class="small text-secondary mb-2">Deskripsi Laporan</label>
-                            <div class="p-3 bg-dark rounded-3 small">{{ $l->ket }}</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="small text-secondary mb-2">Update Status</label>
-                            <select name="status" class="form-select bg-dark border-secondary text-white">
-                                <option value="Menunggu" {{ ($l->aspirasi->status ?? '') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                                <option value="Proses" {{ ($l->aspirasi->status ?? '') == 'Proses' ? 'selected' : '' }}>Proses</option>
-                                <option value="Selesai" {{ ($l->aspirasi->status ?? '') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <label class="small text-secondary mb-2">Pesan Feedback</label>
-                            <textarea name="feedback" class="form-control bg-dark border-secondary text-white" rows="3" required>{{ $l->aspirasi->feedback ?? '' }}</textarea>
-                        </div>
+                        <label class="small text-secondary mb-1">Nama Kategori</label>
+                        <input type="text" name="nama_kategori" class="form-control" placeholder="Contoh: Fasilitas Kelas" required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3">Simpan Perubahan</button>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-primary w-100">Simpan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    @endforeach
+
+    <!-- MODAL ADD USER (Ringkasan) -->
+    <div class="modal fade" id="modalAddUser" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="{{ url('/admin/users') }}" method="POST">
+                    @csrf
+                    <div class="modal-header border-0"><h5 class="fw-bold">Registrasi User Baru</h5></div>
+                    <div class="modal-body">
+                        <div class="mb-3"><label class="small mb-1">Nama Lengkap</label><input type="text" name="nama" class="form-control" required></div>
+                        <div class="mb-3"><label class="small mb-1">NIS / Username</label><input type="text" name="identity" class="form-control" required></div>
+                        <div class="mb-3"><label class="small mb-1">Password</label><input type="password" name="password" class="form-control" required></div>
+                    </div>
+                    <div class="modal-footer border-0 px-3"><button type="submit" class="btn btn-primary w-100">Buat Akun</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gunakan Loop Modal Tanggapi yang sudah kamu buat sebelumnya di sini -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

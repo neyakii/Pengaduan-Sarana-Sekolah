@@ -24,5 +24,5 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 // 4. Dashboard Siswa (Pindah ke SiswaController)
 Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard']);
 Route::post('/siswa/lapor', [SiswaController::class, 'simpanAspirasi']);
-
+Route::post('/siswa/update-foto', [SiswaController::class, 'updateFoto']);
 Route::post('/admin/tanggapi', [AdminController::class, 'tanggapi']);

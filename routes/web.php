@@ -20,6 +20,13 @@ Route::get('/logout', [AuthController::class, 'logout']);
 
 // 3. Dashboard Admin (Pindah ke AdminController)
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+// CRUD Kategori
+Route::post('/admin/kategori', [AdminController::class, 'storeKategori']);
+Route::get('/admin/kategori/hapus/{id}', [AdminController::class, 'destroyKategori']);
+Route::post('/admin/kategori/update/{id}', [AdminController::class, 'updateKategori']);
+// CRUD Siswa
+Route::post('/admin/siswa', [AdminController::class, 'storeSiswa']);
+Route::get('/admin/siswa/hapus/{nis}', [AdminController::class, 'destroySiswa']);
 
 // 4. Dashboard Siswa (Pindah ke SiswaController)
 Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard']);

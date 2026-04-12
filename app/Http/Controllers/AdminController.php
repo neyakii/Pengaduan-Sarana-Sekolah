@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\LogAktivitas;
 use App\Models\InputAspirasi;
 use App\Models\Aspirasi;
+use App\Models\Kategori; // Pastikan model ini ada
+use App\Models\Siswa;   // Pastikan model ini ada
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -14,24 +17,71 @@ class AdminController extends Controller
         if (!Session::has('login_admin')) return redirect('/login');
         
         $logs = LogAktivitas::orderBy('created_at', 'desc')->take(10)->get();
-        
-        // Ambil semua laporan beserta data siswa, kategori, dan tanggapan (jika ada)
         $laporan = InputAspirasi::with(['siswa', 'kategori', 'aspirasi'])
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                    ->orderBy('created_at', 'desc')->get();
+        
+        // Tambahan data untuk CRUD
+        $kategori = Kategori::all();
+        $siswa = Siswa::all();
 
-        return view('admin.dashboard', compact('logs', 'laporan'));
+        return view('admin.dashboard', compact('logs', 'laporan', 'kategori', 'siswa'));
     }
 
-    public function tanggapi(Request $request) {
+    // --- CRUD KATEGORI ---
+    public function storeKategori(Request $request) {
+        Kategori::create($request->only('ket_kategori'));
+        return back()->with('success', 'Kategori berhasil ditambahkan!');
+    }
+
+    public function destroyKategori($id) {
+        Kategori::destroy($id);
+        return back()->with('success', 'Kategori berhasil dihapus!');
+    }
+
+    public function updateKategori(Request $request, $id) {
         $request->validate([
-            'id_pelaporan' => 'required',
-            'status' => 'required',
-            'feedback' => 'required'
+            'ket_kategori' => 'required'
         ]);
 
-        // Simpan atau Update Tanggapan (1 laporan = 1 tanggapan)
-        // Kita gunakan id_pelaporan sebagai id_aspirasi agar sinkron 1:1
+        \App\Models\Kategori::where('id_kategori', $id)->update([
+            'ket_kategori' => $request->ket_kategori
+        ]);
+
+        // Opsional: Catat di Log
+        \App\Models\LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Memperbarui kategori ID: ' . $id
+        ]);
+
+        return back()->with('success', 'Kategori berhasil diperbarui!');
+    }
+
+    // --- CRUD SISWA ---
+    public function storeSiswa(Request $request) {
+        $request->validate([
+            'nis' => 'required|unique:siswa,nis',
+            'nama' => 'required',
+            'password' => 'required'
+        ]);
+
+        Siswa::create([
+            'nis' => $request->nis,
+            'nama' => $request->nama,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return back()->with('success', 'Siswa berhasil didaftarkan!');
+    }
+
+    public function destroySiswa($nis) {
+        Siswa::where('nis', $nis)->delete();
+        return back()->with('success', 'Akun siswa berhasil dihapus!');
+    }
+
+    // --- TANGGAPI ---
+    public function tanggapi(Request $request) {
+        $request->validate(['id_pelaporan' => 'required', 'status' => 'required', 'feedback' => 'required']);
+
         Aspirasi::updateOrCreate(
             ['id_aspirasi' => $request->id_pelaporan], 
             [

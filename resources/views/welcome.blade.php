@@ -159,7 +159,7 @@
     <div class="container hero">
         <div class="row w-100 align-items-center">
             <div class="col-lg-6">
-                <span class="badge badge-modern mb-4">Sistem Informasi Sekolah</span>
+                <span class="badge badge-modern mb-4">Facility Report</span>
                 <h1 class="display-4 mb-4">
                     Sistem Pengaduan<br>
                     <span class="text-gradient">Sarana Sekolah</span>

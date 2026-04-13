@@ -14,6 +14,7 @@
             --accent-purple: #a855f7;
             --card-glass: rgba(255, 255, 255, 0.03);
             --border-glass: rgba(255, 255, 255, 0.08);
+            --dropdown-bg: #111827; /* Warna solid untuk option */
         }
 
         body {
@@ -25,7 +26,7 @@
             position: relative;
         }
 
-        /* Background Glow Orbs (Sama dengan Landing) */
+        /* Background Glow Orbs */
         body::before {
             content: "";
             position: absolute;
@@ -54,7 +55,6 @@
             opacity: 0.15;
         }
 
-        /* Typography & Utilities */
         .text-gradient {
             background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
             -webkit-background-clip: text;
@@ -102,7 +102,6 @@
             transition: 0.3s;
         }
 
-        /* Stats Card */
         .stat-mini-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 18px;
@@ -111,7 +110,6 @@
             text-align: center;
         }
 
-        /* Modern Buttons (Sama dengan Landing) */
         .btn-primary-custom {
             background: #3b82f6;
             border: none;
@@ -132,84 +130,53 @@
 
         /* Table Styling */
         .custom-table { border-spacing: 0 12px; border-collapse: separate; }
-        .custom-table tbody tr {
-            background: rgba(255, 255, 255, 0.02);
-            transition: 0.3s;
-        }
-        .custom-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: scale(1.005);
-        }
-        .custom-table td { 
-            padding: 1.2rem; 
-            border: none; 
-            vertical-align: middle;
-            border-top: 1px solid var(--border-glass);
-            border-bottom: 1px solid var(--border-glass);
-        }
+        .custom-table tbody tr { background: rgba(255, 255, 255, 0.02); transition: 0.3s; }
+        .custom-table tbody tr:hover { background: rgba(255, 255, 255, 0.05); transform: scale(1.005); }
+        .custom-table td { padding: 1.2rem; border: none; vertical-align: middle; border-top: 1px solid var(--border-glass); border-bottom: 1px solid var(--border-glass); }
         .custom-table td:first-child { border-left: 1px solid var(--border-glass); border-radius: 16px 0 0 16px; }
         .custom-table td:last-child { border-right: 1px solid var(--border-glass); border-radius: 0 16px 16px 0; }
 
-        .img-report-box {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
-            object-fit: cover;
-        }
-
         /* Badge Status */
-        .badge-modern {
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .badge-modern { padding: 6px 14px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .st-selesai { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
         .st-proses { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
         .st-menunggu { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
 
-        /* Timeline / Logs */
-        .log-container { max-height: 200px; overflow-y: auto; padding-right: 10px; }
-        .timeline-item {
-            border-left: 2px solid rgba(59, 130, 246, 0.2);
-            padding-left: 15px; padding-bottom: 15px; position: relative;
-        }
-        .timeline-item::after {
-            content: ''; position: absolute; left: -7px; top: 5px;
-            width: 12px; height: 12px; background: var(--primary-blue);
-            border-radius: 50%; box-shadow: 0 0 10px var(--primary-blue);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-
-        /* Modal Customization */
-        .modal-content {
-            background: #0f172a;
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            backdrop-filter: blur(20px);
-        }
+        /* Modal & Form Fixes */
+        .modal-content { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 24px; backdrop-filter: blur(20px); }
+        
         .form-control, .form-select {
-            background: rgba(255,255,255,0.03);
+            background-color: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-glass);
-            color: white;
-            border-radius: 10px;
-            padding: 12px;
+            color: #ffffff !important;
+            border-radius: 12px;
+            padding: 12px 15px;
         }
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.7) !important; /* Putih agak transparan agar elegan */
-            opacity: 1; /* Penting untuk Firefox */
+
+        /* Fix Dropdown Arrow and Option Background */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
         }
-        .form-control:focus {
-            background: rgba(255,255,255,0.05);
+
+        .form-select option {
+            background-color: var(--dropdown-bg); /* Warna gelap solid agar teks putih terbaca */
+            color: #ffffff;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.05);
             border-color: var(--primary-blue);
-            color: white;
-            box-shadow: none;
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+            color: #ffffff;
         }
+
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+        .timeline-item { border-left: 2px solid rgba(59, 130, 246, 0.2); padding-left: 15px; padding-bottom: 15px; position: relative; }
+        .timeline-item::after { content: ''; position: absolute; left: -7px; top: 5px; width: 12px; height: 12px; background: var(--primary-blue); border-radius: 50%; box-shadow: 0 0 10px var(--primary-blue); }
     </style>
 </head>
 <body>
@@ -231,7 +198,7 @@
                     </div>
 
                     <h4 class="fw-800 mb-1">{{ $siswa->nama }}</h4>
-                    <p class="text-white small mb-4">{{ $siswa->kelas }} • {{ $siswa->nis }}</p>
+                    <p class="text-white small mb-4 opacity-75">{{ $siswa->kelas }} • {{ $siswa->nis }}</p>
                     
                     <div class="d-grid mb-4">
                         <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalLapor">
@@ -241,14 +208,14 @@
 
                     <div class="text-start border-top border-secondary border-opacity-10 pt-4">
                         <h6 class="fw-700 mb-3 small text-primary text-uppercase" style="letter-spacing: 1px;">Riwayat Aktivitas</h6>
-                        <div class="log-container">
+                        <div class="log-container overflow-auto" style="max-height: 200px;">
                             @forelse($logs as $log)
                                 <div class="timeline-item">
                                     <div class="text-white small fw-600">{{ $log->aktivitas }}</div>
-                                    <div class="text-white" style="font-size: 0.7rem;">{{ $log->created_at->diffForHumans() }}</div>
+                                    <div class="text-white-50" style="font-size: 0.7rem;">{{ $log->created_at->diffForHumans() }}</div>
                                 </div>
                             @empty
-                                <p class="small text-white">Belum ada aktivitas.</p>
+                                <p class="small text-white-50">Belum ada aktivitas.</p>
                             @endforelse
                         </div>
                     </div>
@@ -263,11 +230,10 @@
 
             <!-- MAIN CONTENT RIGHT -->
             <div class="col-lg-8">
-                <!-- Header Section -->
                 <div class="row g-3 mb-4 align-items-center">
                     <div class="col-md-6">
                         <h2 class="fw-800 mb-1">Selamat Datang, <span class="text-gradient">{{ explode(' ', $siswa->nama)[0] }}!</span></h2>
-                        <p class="text-white small">Pantau status perbaikan fasilitas sekolahmu di sini.</p>
+                        <p class="text-white-50 small">Pantau status perbaikan fasilitas sekolahmu di sini.</p>
                     </div>
                     <div class="col-md-6">
                         <div class="row g-2">
@@ -293,7 +259,6 @@
                     </div>
                 </div>
 
-                <!-- Table Laporan -->
                 <div class="glass-card">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-800 mb-0">Laporan Saya</h5>
@@ -303,7 +268,7 @@
                     <div class="table-responsive">
                         <table class="table custom-table text-white">
                             <thead>
-                                <tr class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">
+                                <tr class="text-white-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">
                                     <th>Bukti Foto</th>
                                     <th>Detail Kerusakan</th>
                                     <th class="text-end">Status</th>
@@ -313,35 +278,33 @@
                                 @forelse($pengaduan as $p)
                                 <tr>
                                     <td style="width: 100px;">
-                                        <img src="{{ asset('storage/'.$p->foto) }}" class="img-report-box shadow">
+                                        <img src="{{ asset('storage/'.$p->foto) }}" class="rounded-3 shadow" style="width: 70px; height: 70px; object-fit: cover;">
                                     </td>
                                     <td>
-                                        <div class="fw-700 mb-1 text-info">{{ $p->lokasi }}</div>
-                                        <p class="text-muted small mb-2" style="line-height: 1.4;">{{ $p->ket }}</p>
+                                        <div class="fw-700 mb-1 text-black">{{ $p->lokasi }}</div>
+                                        <p class="text-black-50 small mb-2" style="line-height: 1.4;">{{ $p->ket }}</p>
                                         
                                         @if($p->aspirasi && $p->aspirasi->feedback)
                                             <div class="p-2 rounded bg-primary bg-opacity-10 border-start border-primary border-3" style="font-size: 0.75rem;">
                                                 <i class="bi bi-chat-left-dots-fill me-1 text-primary"></i>
-                                                <span class="text-muted-50">{{ $p->aspirasi->feedback }}</span>
+                                                <span class="text-black">{{ $p->aspirasi->feedback }}</span>
                                             </div>
                                         @endif
                                     </td>
                                     <td class="text-end">
-                                        @if($p->aspirasi)
-                                            <span class="badge-modern {{ $p->aspirasi->status == 'Selesai' ? 'st-selesai' : ($p->aspirasi->status == 'Proses' ? 'st-proses' : 'st-menunggu') }}">
-                                                {{ $p->aspirasi->status }}
-                                            </span>
-                                        @else
-                                            <span class="badge-modern st-menunggu">Menunggu</span>
-                                        @endif
-                                        <div class="text-muted mt-2" style="font-size: 0.65rem;">{{ $p->created_at->format('d M Y') }}</div>
+                                        @php
+                                            $status = $p->aspirasi->status ?? 'Menunggu';
+                                            $badgeClass = ($status == 'Selesai') ? 'st-selesai' : (($status == 'Proses') ? 'st-proses' : 'st-menunggu');
+                                        @endphp
+                                        <span class="badge-modern {{ $badgeClass }}">{{ $status }}</span>
+                                        <div class="text-white-50 mt-2" style="font-size: 0.65rem;">{{ $p->created_at->format('d M Y') }}</div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
                                     <td colspan="3" class="text-center py-5">
                                         <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="60" class="opacity-25 mb-3">
-                                        <p class="text-muted small">Belum ada laporan yang diajukan.</p>
+                                        <p class="text-white-50 small">Belum ada laporan yang diajukan.</p>
                                     </td>
                                 </tr>
                                 @endforelse
@@ -353,10 +316,10 @@
         </div>
     </div>
 
-    <!-- MODAL UPDATE PROFILE (Sesuai gaya Dark) -->
+    <!-- MODAL PROFILE -->
     <div class="modal fade" id="modalProfile" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content shadow-lg">
+            <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
                     <h6 class="modal-title fw-800 text-white">Ganti Foto Profil</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -364,7 +327,7 @@
                 <form action="{{ url('/siswa/update-foto') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body text-center">
-                        <p class="text-white small mb-3">Gunakan foto formal agar mudah dikenali oleh admin.</p>
+                        <p class="text-white-50 small mb-3">Gunakan foto formal agar mudah dikenali oleh admin.</p>
                         <input type="file" name="foto_profile" class="form-control" accept="image/*" required>
                     </div>
                     <div class="modal-footer border-0">
@@ -375,7 +338,7 @@
         </div>
     </div>
 
-    <!-- MODAL LAPOR (Sesuai gaya Dark) -->
+    <!-- MODAL LAPOR -->
     <div class="modal fade" id="modalLapor" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -389,7 +352,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="small text-white mb-2 fw-600">Kategori Fasilitas</label>
-                                <select name="id_kategori" class="form-select text-bg-dark" required>
+                                <select name="id_kategori" class="form-select" required>
                                     <option value="" disabled selected>Pilih Kategori</option>
                                     @foreach($kategori as $k)
                                         <option value="{{ $k->id_kategori }}">{{ $k->ket_kategori }}</option>
@@ -398,11 +361,11 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="small text-white mb-2 fw-600">Lokasi Spesifik</label>
-                                <input type="text" name="lokasi" class="form-control" placeholder="Contoh: Ruang Kelas D202 / Toilet Perpus" required>
+                                <input type="text" name="lokasi" class="form-control" placeholder="Contoh: Kelas D202 / Kantin" required>
                             </div>
                             <div class="col-12">
                                 <label class="small text-white mb-2 fw-600">Deskripsi Kerusakan</label>
-                                <textarea name="ket" class="form-control" rows="4" placeholder="Jelaskan detail kerusakan Contoh: Kaki kursi patah / AC tidak dingin" required></textarea>
+                                <textarea name="ket" class="form-control" rows="4" placeholder="Jelaskan detail kerusakan..." required></textarea>
                             </div>
                             <div class="col-12">
                                 <label class="small text-white mb-2 fw-600">Unggah Foto Bukti</label>
@@ -421,18 +384,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: "{{ session('success') }}",
-                    background: '#0f172a',
-                    color: '#ffffff',
-                    confirmButtonColor: '#3b82f6'
-                });
-            @endif
-        });
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                background: '#0f172a',
+                color: '#ffffff',
+                confirmButtonColor: '#3b82f6'
+            });
+        @endif
     </script>
 </body>
 </html>

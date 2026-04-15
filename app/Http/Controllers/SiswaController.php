@@ -81,11 +81,11 @@ class SiswaController extends Controller
 
     // Update Laporan
     public function updateLapor(Request $request, $id) {
-        $pengaduan = Pengaduan::findOrFail($id);
+        // Cari berdasarkan id_pelaporan
+        $pengaduan = \App\Models\InputAspirasi::findOrFail($id);
         
-        // Keamanan: Pastikan laporan milik siswa yang login dan status masih Menunggu
-        if($pengaduan->nis != session('nis') || ($pengaduan->aspirasi && $pengaduan->aspirasi->status != 'Menunggu')) {
-            return back()->with('error', 'Akses ditolak atau status sudah diproses.');
+        if($pengaduan->nis != session('nis')) {
+            return back()->with('error', 'Akses ditolak.');
         }
 
         $pengaduan->id_kategori = $request->id_kategori;
@@ -93,25 +93,42 @@ class SiswaController extends Controller
         $pengaduan->ket = $request->ket;
 
         if ($request->hasFile('foto_kerusakan')) {
-            // Hapus foto lama jika perlu, lalu upload yang baru
-            $path = $request->file('foto_kerusakan')->store('pengaduan', 'public');
-            $pengaduan->foto = $path;
+            $file = $request->file('foto_kerusakan');
+            $nama_foto = time() . '_' . session('nis') . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('storage/aspirasi'), $nama_foto);
+            $pengaduan->foto = 'aspirasi/' . $nama_foto;
         }
 
         $pengaduan->save();
-        return back()->with('success', 'Laporan berhasil diperbarui.');
+
+        // --- TAMBAHKAN LOG DI SINI ---
+        \App\Models\LogAktivitas::create([
+            'nis' => session('nis'),
+            'aktivitas' => 'Memperbarui laporan di lokasi: ' . $request->lokasi
+        ]);
+
+        return back()->with('success', 'Laporan berhasil diperbarui!');
     }
 
     // Hapus Laporan
     public function destroyLapor($id) {
-        $pengaduan = Pengaduan::findOrFail($id);
+        $pengaduan = \App\Models\InputAspirasi::findOrFail($id);
         
-        // Cek status lagi untuk keamanan
-        if($pengaduan->aspirasi && $pengaduan->aspirasi->status != 'Menunggu') {
-            return back()->with('error', 'Laporan yang sedang diproses tidak bisa dibatalkan.');
+        if($pengaduan->nis != session('nis')) {
+            return back()->with('error', 'Akses ditolak.');
         }
 
+        // Simpan lokasi sementara untuk keperluan catatan log sebelum data dihapus
+        $lokasi_lama = $pengaduan->lokasi;
+
         $pengaduan->delete();
+
+        // --- TAMBAHKAN LOG DI SINI ---
+        \App\Models\LogAktivitas::create([
+            'nis' => session('nis'),
+            'aktivitas' => 'Membatalkan laporan di lokasi: ' . $lokasi_lama
+        ]);
+
         return back()->with('success', 'Laporan berhasil dibatalkan.');
     }
 }

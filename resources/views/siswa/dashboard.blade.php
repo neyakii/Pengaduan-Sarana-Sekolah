@@ -276,6 +276,7 @@
                                     <th class="text-end">Status</th>
                                 </tr>
                             </thead>
+                            <!-- Cari bagian <tbody> di file dashboard kamu dan ganti dengan ini -->
                             <tbody>
                                 @forelse($pengaduan as $p)
                                 @php
@@ -287,6 +288,7 @@
                                         <img src="{{ asset('storage/'.$p->foto) }}" class="rounded-3 shadow" style="width: 70px; height: 70px; object-fit: cover;">
                                     </td>
                                     <td>
+                                        <!-- PERBAIKAN: text-black agar tulisan kelihatan -->
                                         <div class="fw-700 mb-1 text-black">{{ $p->lokasi }}</div>
                                         <p class="text-black-50 small mb-2" style="line-height: 1.4;">{{ $p->ket }}</p>
                                         
@@ -297,17 +299,17 @@
                                             </div>
                                         @endif
 
-                                        <!-- ACTION BUTTONS (Only if Status is Menunggu) -->
+                                        <!-- ACTION BUTTONS (GANTI id_pengaduan ke id_pelaporan) -->
                                         @if($status == 'Menunggu')
                                         <div class="mt-2">
                                             <button class="btn btn-sm btn-outline-info me-1 py-1 px-3 rounded-pill" 
                                                     style="font-size: 0.7rem;"
-                                                    onclick="editLaporan('{{ $p->id_pengaduan }}', '{{ $p->id_kategori }}', '{{ $p->lokasi }}', '{{ $p->ket }}')">
+                                                    onclick="editLaporan('{{ $p->id_pelaporan }}', '{{ $p->id_kategori }}', '{{ $p->lokasi }}', '{{ $p->ket }}')">
                                                 <i class="bi bi-pencil-square me-1"></i> Edit
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill" 
                                                     style="font-size: 0.7rem;"
-                                                    onclick="confirmDelete('{{ $p->id_pengaduan }}')">
+                                                    onclick="confirmDelete('{{ $p->id_pelaporan }}')">
                                                 <i class="bi bi-trash me-1"></i> Batal
                                             </button>
                                         </div>
@@ -321,7 +323,6 @@
                                 @empty
                                 <tr>
                                     <td colspan="3" class="text-center py-5">
-                                        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="60" class="opacity-25 mb-3">
                                         <p class="text-white-50 small">Belum ada laporan yang diajukan.</p>
                                     </td>
                                 </tr>

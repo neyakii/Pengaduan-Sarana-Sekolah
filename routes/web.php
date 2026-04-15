@@ -33,3 +33,5 @@ Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard']);
 Route::post('/siswa/lapor', [SiswaController::class, 'simpanAspirasi']);
 Route::post('/siswa/update-foto', [SiswaController::class, 'updateFoto']);
 Route::post('/admin/tanggapi', [AdminController::class, 'tanggapi']);
+Route::put('/siswa/lapor/update/{id}', [SiswaController::class, 'updateLapor']);
+Route::delete('/siswa/lapor/delete/{id}', [SiswaController::class, 'destroyLapor']);

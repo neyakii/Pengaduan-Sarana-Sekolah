@@ -7,6 +7,7 @@ use App\Models\InputAspirasi;
 use App\Models\Aspirasi;
 use App\Models\Kategori; // Pastikan model ini ada
 use App\Models\Siswa;   // Pastikan model ini ada
+use App\Models\Lokasi;  
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
@@ -23,8 +24,9 @@ class AdminController extends Controller
         // Tambahan data untuk CRUD
         $kategori = Kategori::all();
         $siswa = Siswa::all();
+        $lokasi = Lokasi::all(); // <--- PASTIKAN INI ADA
 
-        return view('admin.dashboard', compact('logs', 'laporan', 'kategori', 'siswa'));
+        return view('admin.dashboard', compact('logs', 'laporan', 'kategori', 'siswa', 'lokasi'));
     }
 
     // --- CRUD KATEGORI ---
@@ -97,5 +99,23 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'Tanggapan berhasil disimpan!');
+    }
+
+    // Tambahkan juga fungsi simpan, update, dan hapus untuk lokasi
+    public function storeLokasi(Request $request) {
+        Lokasi::create($request->all());
+        return back()->with('success', 'Lokasi berhasil ditambahkan');
+    }
+
+    public function updateLokasi(Request $request) {
+        Lokasi::where('id_lokasi', $request->id_lokasi)->update([
+            'nama_lokasi' => $request->nama_lokasi
+        ]);
+        return back()->with('success', 'Lokasi berhasil diperbarui');
+    }
+
+    public function destroyLokasi($id) {
+        Lokasi::where('id_lokasi', $id)->delete();
+        return back()->with('success', 'Lokasi berhasil dihapus');
     }
 }

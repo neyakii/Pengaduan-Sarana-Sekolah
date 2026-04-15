@@ -27,6 +27,9 @@ Route::post('/admin/kategori/update/{id}', [AdminController::class, 'updateKateg
 // CRUD Siswa
 Route::post('/admin/siswa', [AdminController::class, 'storeSiswa']);
 Route::get('/admin/siswa/hapus/{nis}', [AdminController::class, 'destroySiswa']);
+Route::post('/admin/lokasi', [AdminController::class, 'storeLokasi']);
+Route::post('/admin/lokasi/update', [AdminController::class, 'updateLokasi']);
+Route::get('/admin/lokasi/hapus/{id}', [AdminController::class, 'destroyLokasi']);
 
 // 4. Dashboard Siswa (Pindah ke SiswaController)
 Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard']);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Siswa;
+use App\Models\Lokasi;        // TAMBAHKAN INI
 use App\Models\Kategori;
 use App\Models\LogAktivitas;
 use App\Models\InputAspirasi;
@@ -18,6 +19,8 @@ class SiswaController extends Controller
     $siswa = Siswa::where('nis', session('nis'))->first();
     $logs = LogAktivitas::where('nis', session('nis'))->orderBy('created_at', 'desc')->get();
     $kategori = Kategori::all();
+    $lokasi = Lokasi::all(); // TAMBAHKAN INI
+
 
         // TAMBAHKAN with('aspirasi') DI SINI
     $pengaduan = InputAspirasi::with('aspirasi')
@@ -25,7 +28,7 @@ class SiswaController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-    return view('siswa.dashboard', compact('siswa', 'logs', 'kategori', 'pengaduan'));
+    return view('siswa.dashboard', compact('siswa', 'pengaduan', 'kategori', 'lokasi', 'logs'));
     }
 
     // Contoh logic di Controller

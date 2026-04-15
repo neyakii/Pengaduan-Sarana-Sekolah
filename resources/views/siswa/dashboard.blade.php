@@ -301,7 +301,7 @@
                                     </td>
                                     <td>
                                         <!-- PERBAIKAN: text-black agar tulisan kelihatan -->
-                                        <div class="fw-700 mb-1 text-black">{{ $p->lokasi }}</div>
+                                        <div class="fw-700 mb-1 text-white">{{ $p->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak ada' }}</div>
                                         <p class="text-black-50 small mb-2" style="line-height: 1.4;">{{ $p->ket }}</p>
                                         
                                         @if($p->aspirasi && $p->aspirasi->feedback)
@@ -316,7 +316,7 @@
                                         <div class="mt-2">
                                             <button class="btn btn-sm btn-outline-info me-1 py-1 px-3 rounded-pill" 
                                                     style="font-size: 0.7rem;"
-                                                    onclick="editLaporan('{{ $p->id_pelaporan }}', '{{ $p->id_kategori }}', '{{ $p->lokasi }}', '{{ $p->ket }}')">
+                                                    onclick="editLaporan('{{ $p->id_pelaporan }}', '{{ $p->id_kategori }}', '{{ $p->id_lokasi }}', '{{ $p->ket }}')">
                                                 <i class="bi bi-pencil-square me-1"></i> Edit
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill" 
@@ -329,13 +329,13 @@
                                     </td>
                                     <td class="text-end">
                                         <span class="badge-modern {{ $badgeClass }}">{{ $status }}</span>
-                                        <div class="text-white-50 mt-2" style="font-size: 0.65rem;">{{ $p->created_at->format('d M Y') }}</div>
+                                        <div class="text-black-50 mt-2" style="font-size: 0.65rem;">{{ $p->created_at->format('d M Y') }}</div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
                                     <td colspan="3" class="text-center py-5">
-                                        <p class="text-white-50 small">Belum ada laporan yang diajukan.</p>
+                                        <p class="text-black-50 small">Belum ada laporan yang diajukan.</p>
                                     </td>
                                 </tr>
                                 @endforelse
@@ -391,7 +391,12 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="small text-white mb-2 fw-600">Lokasi Spesifik</label>
-                                <input type="text" name="lokasi" class="form-control" placeholder="Contoh: Kelas D202" required>
+                                <select name="id_lokasi" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Lokasi</option>
+                                    @foreach($lokasi as $l)
+                                        <option value="{{ $l->id_lokasi }}">{{ $l->nama_lokasi }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-12">
                                 <label class="small text-white mb-2 fw-600">Deskripsi Kerusakan</label>
@@ -432,9 +437,14 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <!-- Bagian Lokasi di Modal Edit -->
                             <div class="col-md-6">
                                 <label class="small text-white mb-2 fw-600">Lokasi Spesifik</label>
-                                <input type="text" name="lokasi" id="edit_lokasi" class="form-control" required>
+                                <select name="id_lokasi" id="edit_lokasi" class="form-select" required>
+                                    @foreach($lokasi as $l)
+                                        <option value="{{ $l->id_lokasi }}">{{ $l->nama_lokasi }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-12">
                                 <label class="small text-white mb-2 fw-600">Deskripsi Kerusakan</label>
@@ -476,21 +486,18 @@
         @endif
 
         // Logic for Edit Modal
-        function editLaporan(id, kategori, lokasi, ket) {
+        function editLaporan(id, kategori, id_lokasi, ket) { // Ganti parameter lokasi jadi id_lokasi
             const modal = new bootstrap.Modal(document.getElementById('modalEdit'));
             const form = document.getElementById('formEdit');
             
-            // Set action URL secara dinamis sesuai ID
             form.action = '/siswa/lapor/update/' + id;
             
-            // Isi data ke dalam field
             document.getElementById('edit_kategori').value = kategori;
-            document.getElementById('edit_lokasi').value = lokasi;
+            document.getElementById('edit_lokasi').value = id_lokasi; // Sekarang mengisi value ID ke dropdown
             document.getElementById('edit_ket').value = ket;
             
             modal.show();
         }
-
         // Logic for Delete Confirmation
         function confirmDelete(id) {
             Swal.fire({

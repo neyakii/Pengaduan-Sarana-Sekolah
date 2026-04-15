@@ -14,7 +14,7 @@
             --accent-purple: #a855f7;
             --card-glass: rgba(255, 255, 255, 0.03);
             --border-glass: rgba(255, 255, 255, 0.08);
-            --dropdown-bg: #111827; /* Warna solid untuk option */
+            --dropdown-bg: #111827;
         }
 
         body {
@@ -70,7 +70,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Profile Styles */
         .profile-img-wrapper {
             position: relative;
             display: inline-block;
@@ -128,10 +127,30 @@
             color: white;
         }
 
+        .form-control, .form-select {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: #ffffff !important; /* Warna teks saat mengetik */
+            border-radius: 12px;
+            padding: 12px 15px;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+            opacity: 1;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+            color: #ffffff;
+        }
+
         /* Table Styling */
         .custom-table { border-spacing: 0 12px; border-collapse: separate; }
         .custom-table tbody tr { background: rgba(255, 255, 255, 0.02); transition: 0.3s; }
-        .custom-table tbody tr:hover { background: rgba(255, 255, 255, 0.05); transform: scale(1.005); }
+        .custom-table tbody tr:hover { background: rgba(255, 255, 255, 0.05); }
         .custom-table td { padding: 1.2rem; border: none; vertical-align: middle; border-top: 1px solid var(--border-glass); border-bottom: 1px solid var(--border-glass); }
         .custom-table td:first-child { border-left: 1px solid var(--border-glass); border-radius: 16px 0 0 16px; }
         .custom-table td:last-child { border-right: 1px solid var(--border-glass); border-radius: 0 16px 16px 0; }
@@ -144,7 +163,6 @@
 
         /* Modal & Form Fixes */
         .modal-content { background: #0f172a; border: 1px solid var(--border-glass); border-radius: 24px; backdrop-filter: blur(20px); }
-        
         .form-control, .form-select {
             background-color: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-glass);
@@ -152,28 +170,12 @@
             border-radius: 12px;
             padding: 12px 15px;
         }
-
-        /* Fix Dropdown Arrow and Option Background */
-        .form-select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-        }
-
-        .form-select option {
-            background-color: var(--dropdown-bg); /* Warna gelap solid agar teks putih terbaca */
-            color: #ffffff;
-        }
-
+        .form-select option { background-color: var(--dropdown-bg); color: #ffffff; }
         .form-control:focus, .form-select:focus {
             background-color: rgba(255, 255, 255, 0.05);
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
-            color: #ffffff;
         }
-
-        .form-control::placeholder { color: rgba(255, 255, 255, 0.4); }
 
         .timeline-item { border-left: 2px solid rgba(59, 130, 246, 0.2); padding-left: 15px; padding-bottom: 15px; position: relative; }
         .timeline-item::after { content: ''; position: absolute; left: -7px; top: 5px; width: 12px; height: 12px; background: var(--primary-blue); border-radius: 50%; box-shadow: 0 0 10px var(--primary-blue); }
@@ -268,14 +270,18 @@
                     <div class="table-responsive">
                         <table class="table custom-table text-white">
                             <thead>
-                                <tr class="text-white-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">
-                                    <th>Bukti Foto</th>
+                                <tr class="text-black-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">
+                                    <th>Bukti</th>
                                     <th>Detail Kerusakan</th>
                                     <th class="text-end">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($pengaduan as $p)
+                                @php
+                                    $status = $p->aspirasi->status ?? 'Menunggu';
+                                    $badgeClass = ($status == 'Selesai') ? 'st-selesai' : (($status == 'Proses') ? 'st-proses' : 'st-menunggu');
+                                @endphp
                                 <tr>
                                     <td style="width: 100px;">
                                         <img src="{{ asset('storage/'.$p->foto) }}" class="rounded-3 shadow" style="width: 70px; height: 70px; object-fit: cover;">
@@ -285,17 +291,29 @@
                                         <p class="text-black-50 small mb-2" style="line-height: 1.4;">{{ $p->ket }}</p>
                                         
                                         @if($p->aspirasi && $p->aspirasi->feedback)
-                                            <div class="p-2 rounded bg-primary bg-opacity-10 border-start border-primary border-3" style="font-size: 0.75rem;">
+                                            <div class="p-2 mb-2 rounded bg-primary bg-opacity-10 border-start border-primary border-3" style="font-size: 0.75rem;">
                                                 <i class="bi bi-chat-left-dots-fill me-1 text-primary"></i>
                                                 <span class="text-black">{{ $p->aspirasi->feedback }}</span>
                                             </div>
                                         @endif
+
+                                        <!-- ACTION BUTTONS (Only if Status is Menunggu) -->
+                                        @if($status == 'Menunggu')
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-outline-info me-1 py-1 px-3 rounded-pill" 
+                                                    style="font-size: 0.7rem;"
+                                                    onclick="editLaporan('{{ $p->id_pengaduan }}', '{{ $p->id_kategori }}', '{{ $p->lokasi }}', '{{ $p->ket }}')">
+                                                <i class="bi bi-pencil-square me-1"></i> Edit
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill" 
+                                                    style="font-size: 0.7rem;"
+                                                    onclick="confirmDelete('{{ $p->id_pengaduan }}')">
+                                                <i class="bi bi-trash me-1"></i> Batal
+                                            </button>
+                                        </div>
+                                        @endif
                                     </td>
                                     <td class="text-end">
-                                        @php
-                                            $status = $p->aspirasi->status ?? 'Menunggu';
-                                            $badgeClass = ($status == 'Selesai') ? 'st-selesai' : (($status == 'Proses') ? 'st-proses' : 'st-menunggu');
-                                        @endphp
                                         <span class="badge-modern {{ $badgeClass }}">{{ $status }}</span>
                                         <div class="text-white-50 mt-2" style="font-size: 0.65rem;">{{ $p->created_at->format('d M Y') }}</div>
                                     </td>
@@ -317,7 +335,7 @@
     </div>
 
     <!-- MODAL PROFILE -->
-    <div class="modal fade" id="modalProfile" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="modalProfile" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
@@ -327,7 +345,6 @@
                 <form action="{{ url('/siswa/update-foto') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body text-center">
-                        <p class="text-white-50 small mb-3">Gunakan foto formal agar mudah dikenali oleh admin.</p>
                         <input type="file" name="foto_profile" class="form-control" accept="image/*" required>
                     </div>
                     <div class="modal-footer border-0">
@@ -338,7 +355,7 @@
         </div>
     </div>
 
-    <!-- MODAL LAPOR -->
+    <!-- MODAL LAPOR BARU -->
     <div class="modal fade" id="modalLapor" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -361,7 +378,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="small text-white mb-2 fw-600">Lokasi Spesifik</label>
-                                <input type="text" name="lokasi" class="form-control" placeholder="Contoh: Kelas D202 / Kantin" required>
+                                <input type="text" name="lokasi" class="form-control" placeholder="Contoh: Kelas D202" required>
                             </div>
                             <div class="col-12">
                                 <label class="small text-white mb-2 fw-600">Deskripsi Kerusakan</label>
@@ -381,9 +398,59 @@
         </div>
     </div>
 
+    <!-- MODAL EDIT LAPORAN -->
+    <div class="modal fade" id="modalEdit" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-800"><span class="text-gradient">Edit Laporan</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formEdit" action="" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="small text-white mb-2 fw-600">Kategori Fasilitas</label>
+                                <select name="id_kategori" id="edit_kategori" class="form-select" required>
+                                    @foreach($kategori as $k)
+                                        <option value="{{ $k->id_kategori }}">{{ $k->ket_kategori }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-white mb-2 fw-600">Lokasi Spesifik</label>
+                                <input type="text" name="lokasi" id="edit_lokasi" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="small text-white mb-2 fw-600">Deskripsi Kerusakan</label>
+                                <textarea name="ket" id="edit_ket" class="form-control" rows="4" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="small text-white mb-2 fw-600">Ganti Foto (Opsional)</label>
+                                <input type="file" name="foto_kerusakan" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Delete Form -->
+    <form id="formDelete" action="" method="POST" style="display:none;">
+        @csrf
+        @method('DELETE')
+    </form>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // SweetAlert for Success Message
         @if(session('success'))
             Swal.fire({
                 icon: 'success',
@@ -394,6 +461,44 @@
                 confirmButtonColor: '#3b82f6'
             });
         @endif
+
+        // Logic for Edit Modal
+        function editLaporan(id, kategori, lokasi, ket) {
+            const modal = new bootstrap.Modal(document.getElementById('modalEdit'));
+            const form = document.getElementById('formEdit');
+            
+            // Set action URL secara dinamis sesuai ID
+            form.action = '/siswa/lapor/update/' + id;
+            
+            // Isi data ke dalam field
+            document.getElementById('edit_kategori').value = kategori;
+            document.getElementById('edit_lokasi').value = lokasi;
+            document.getElementById('edit_ket').value = ket;
+            
+            modal.show();
+        }
+
+        // Logic for Delete Confirmation
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Batalkan Laporan?',
+                text: "Laporan yang dihapus tidak dapat dikembalikan.",
+                icon: 'warning',
+                showCancelButton: true,
+                background: '#0f172a',
+                color: '#ffffff',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('formDelete');
+                    form.action = '/siswa/lapor/delete/' + id;
+                    form.submit();
+                }
+            })
+        }
     </script>
 </body>
 </html>

@@ -78,4 +78,40 @@ class SiswaController extends Controller
             return back()->with('success', 'Laporan berhasil dikirim!');
         }
     }
+
+    // Update Laporan
+    public function updateLapor(Request $request, $id) {
+        $pengaduan = Pengaduan::findOrFail($id);
+        
+        // Keamanan: Pastikan laporan milik siswa yang login dan status masih Menunggu
+        if($pengaduan->nis != session('nis') || ($pengaduan->aspirasi && $pengaduan->aspirasi->status != 'Menunggu')) {
+            return back()->with('error', 'Akses ditolak atau status sudah diproses.');
+        }
+
+        $pengaduan->id_kategori = $request->id_kategori;
+        $pengaduan->lokasi = $request->lokasi;
+        $pengaduan->ket = $request->ket;
+
+        if ($request->hasFile('foto_kerusakan')) {
+            // Hapus foto lama jika perlu, lalu upload yang baru
+            $path = $request->file('foto_kerusakan')->store('pengaduan', 'public');
+            $pengaduan->foto = $path;
+        }
+
+        $pengaduan->save();
+        return back()->with('success', 'Laporan berhasil diperbarui.');
+    }
+
+    // Hapus Laporan
+    public function destroyLapor($id) {
+        $pengaduan = Pengaduan::findOrFail($id);
+        
+        // Cek status lagi untuk keamanan
+        if($pengaduan->aspirasi && $pengaduan->aspirasi->status != 'Menunggu') {
+            return back()->with('error', 'Laporan yang sedang diproses tidak bisa dibatalkan.');
+        }
+
+        $pengaduan->delete();
+        return back()->with('success', 'Laporan berhasil dibatalkan.');
+    }
 }

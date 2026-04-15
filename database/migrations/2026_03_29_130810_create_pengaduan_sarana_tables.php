@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nama', 100);
             $table->string('kelas', 10);
             $table->string('foto_profile', 255)->nullable();
-            $table->string('password'); // Tambahan kolom password
+            $table->string('password');
             $table->timestamps();
         });
 
@@ -35,12 +35,19 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 4. Tabel Input Aspirasi
+        // 4. Tabel Lokasi (BARU)
+        Schema::create('lokasi', function (Blueprint $table) {
+            $table->bigIncrements('id_lokasi');
+            $table->string('nama_lokasi', 50);
+            $table->timestamps();
+        });
+
+        // 5. Tabel Input Aspirasi
         Schema::create('input_aspirasi', function (Blueprint $table) {
             $table->bigIncrements('id_pelaporan');
             $table->char('nis', 10);
             $table->unsignedBigInteger('id_kategori');
-            $table->string('lokasi', 50);
+            $table->unsignedBigInteger('id_lokasi'); // DIUBAH: Menghubungkan ke tabel lokasi
             $table->string('ket', 100);
             $table->string('foto', 100);
             $table->timestamps();
@@ -48,21 +55,23 @@ return new class extends Migration
             // Foreign Keys
             $table->foreign('nis')->references('nis')->on('siswa')->onDelete('cascade');
             $table->foreign('id_kategori')->references('id_kategori')->on('kategori')->onDelete('cascade');
+            $table->foreign('id_lokasi')->references('id_lokasi')->on('lokasi')->onDelete('cascade'); // BARU
         });
 
-        // 5. Tabel Aspirasi (Tanggapan/Status)
+        // 6. Tabel Aspirasi (Tanggapan/Status)
         Schema::create('aspirasi', function (Blueprint $table) {
             $table->bigIncrements('id_aspirasi');
             $table->enum('status', ['Menunggu', 'Proses', 'Selesai'])->default('Menunggu');
             $table->unsignedBigInteger('id_kategori');
             $table->text('feedback')->nullable();
+            $table->string('foto', 255)->nullable(); // BARU: Menambah kolom foto di aspirasi
             $table->timestamps();
 
             // Foreign Key
             $table->foreign('id_kategori')->references('id_kategori')->on('kategori')->onDelete('cascade');
         });
 
-        // 6. Tabel Log Aktivitas
+        // 7. Tabel Log Aktivitas
         Schema::create('log_aktivitas', function (Blueprint $table) {
             $table->bigIncrements('id_log');
             $table->char('nis', 10)->nullable();
@@ -84,6 +93,7 @@ return new class extends Migration
         Schema::dropIfExists('log_aktivitas');
         Schema::dropIfExists('aspirasi');
         Schema::dropIfExists('input_aspirasi');
+        Schema::dropIfExists('lokasi'); // BARU
         Schema::dropIfExists('kategori');
         Schema::dropIfExists('admin');
         Schema::dropIfExists('siswa');

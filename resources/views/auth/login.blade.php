@@ -76,12 +76,19 @@
             transition: all 0.3s;
         }
 
+        /* --- TAMBAHAN UNTUK PLACEHOLDER --- */
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+            opacity: 1;
+        }
+
         .form-control:focus {
             background: rgba(15, 23, 42, 0.8);
             border-color: var(--accent-color);
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
             color: white;
         }
+        
 
         .btn-login {
             background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);

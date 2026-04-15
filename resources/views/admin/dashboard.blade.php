@@ -225,13 +225,21 @@
                     <div class="col-md-4">
                         <div class="glass-card text-center" style="border-bottom: 3px solid #fbbf24;">
                             <p class="text-warning small mb-1">MENUNGGU</p>
-                            <h2 class="fw-800 mb-0 text-warning">{{ count($laporan->where('aspirasi.status', 'Menunggu')) }}</h2>
+                            <h2 class="fw-800 mb-0 text-warning">
+                                {{ $laporan->filter(function($item) {
+                                    return ($item->aspirasi->status ?? 'Menunggu') == 'Menunggu';
+                                })->count() }}
+                            </h2>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="glass-card text-center" style="border-bottom: 3px solid #4ade80;">
                             <p class="text-success small mb-1">SELESAI</p>
-                            <h2 class="fw-800 mb-0 text-success">{{ count($laporan->where('aspirasi.status', 'Selesai')) }}</h2>
+                            <h2 class="fw-800 mb-0 text-success">
+                                {{ $laporan->filter(function($item) {
+                                    return ($item->aspirasi->status ?? '') == 'Selesai';
+                                })->count() }}
+                            </h2>
                         </div>
                     </div>
                 </div>

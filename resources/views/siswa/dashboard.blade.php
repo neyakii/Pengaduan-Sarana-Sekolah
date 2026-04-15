@@ -233,25 +233,37 @@
             <!-- MAIN CONTENT RIGHT -->
             <div class="col-lg-8">
                 <div class="row g-3 mb-4 align-items-center">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <h2 class="fw-800 mb-1">Selamat Datang, <span class="text-gradient">{{ explode(' ', $siswa->nama)[0] }}!</span></h2>
-                        <p class="text-white-50 small">Pantau status perbaikan fasilitas sekolahmu di sini.</p>
+                        <p class="text-white-50 small mb-0">Pantau status perbaikan fasilitas sekolahmu.</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-7">
+                        <!-- Grid disesuaikan menjadi col-3 agar 4 card sejajar sempurna (3x4=12) -->
                         <div class="row g-2">
-                            <div class="col-4">
+                            <div class="col-3">
                                 <div class="stat-mini-card">
                                     <div class="text-white-50 mb-1" style="font-size: 0.65rem;">TOTAL</div>
                                     <div class="h5 fw-800 mb-0">{{ count($pengaduan) }}</div>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <div class="stat-mini-card">
-                                    <div class="text-warning mb-1" style="font-size: 0.65rem;">PROSES</div>
-                                    <div class="h5 fw-800 mb-0 text-warning">{{ $pengaduan->where('aspirasi.status', 'Proses')->count() }}</div>
+                                    <div class="text-warning mb-1" style="font-size: 0.65rem;">MENUNGGU</div>
+                                    <div class="h5 fw-800 mb-0 text-warning">
+                                        {{ $pengaduan->filter(function($p) {
+                                            return ($p->aspirasi->status ?? 'Menunggu') == 'Menunggu';
+                                        })->count() }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
+                                <div class="stat-mini-card">
+                                    <!-- Warna diganti ke Biru (Primary/Info) -->
+                                    <div class="text-primary mb-1" style="font-size: 0.65rem;">PROSES</div>
+                                    <div class="h5 fw-800 mb-0 text-primary">{{ $pengaduan->where('aspirasi.status', 'Proses')->count() }}</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
                                 <div class="stat-mini-card">
                                     <div class="text-success mb-1" style="font-size: 0.65rem;">SELESAI</div>
                                     <div class="h5 fw-800 mb-0 text-success">{{ $pengaduan->where('aspirasi.status', 'Selesai')->count() }}</div>

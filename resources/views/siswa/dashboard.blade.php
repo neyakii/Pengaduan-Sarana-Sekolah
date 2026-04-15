@@ -301,7 +301,7 @@
                                     </td>
                                     <td>
                                         <!-- PERBAIKAN: text-black agar tulisan kelihatan -->
-                                        <div class="fw-700 mb-1 text-white">{{ $p->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak ada' }}</div>
+                                        <div class="fw-700 mb-1 text-black">{{ $p->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak ada' }}</div>
                                         <p class="text-black-50 small mb-2" style="line-height: 1.4;">{{ $p->ket }}</p>
                                         
                                         @if($p->aspirasi && $p->aspirasi->feedback)

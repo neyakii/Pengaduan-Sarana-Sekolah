@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\LogAktivitas;
 use App\Models\InputAspirasi;
 use App\Models\Aspirasi;
-use App\Models\Kategori; // Pastikan model ini ada
-use App\Models\Siswa;   // Pastikan model ini ada
+use App\Models\Kategori; 
+use App\Models\Siswa;   
 use App\Models\Lokasi;  
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -21,41 +21,54 @@ class AdminController extends Controller
         $laporan = InputAspirasi::with(['siswa', 'kategori', 'aspirasi'])
                     ->orderBy('created_at', 'desc')->get();
         
-        // Tambahan data untuk CRUD
         $kategori = Kategori::all();
         $siswa = Siswa::all();
-        $lokasi = Lokasi::all(); // <--- PASTIKAN INI ADA
+        $lokasi = Lokasi::all(); 
 
         return view('admin.dashboard', compact('logs', 'laporan', 'kategori', 'siswa', 'lokasi'));
     }
 
     // --- CRUD KATEGORI ---
     public function storeKategori(Request $request) {
+        $request->validate(['ket_kategori' => 'required']);
+        
         Kategori::create($request->only('ket_kategori'));
+
+        // Catat Log
+        LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Menambah kategori baru: ' . $request->ket_kategori
+        ]);
+
         return back()->with('success', 'Kategori berhasil ditambahkan!');
+    }
+
+    public function updateKategori(Request $request) {
+        $request->validate(['id_kategori' => 'required', 'ket_kategori' => 'required']);
+
+        Kategori::where('id_kategori', $request->id_kategori)->update([
+            'ket_kategori' => $request->ket_kategori
+        ]);
+
+        // Catat Log
+        LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Mengubah nama kategori menjadi: ' . $request->ket_kategori
+        ]);
+
+        return back()->with('success', 'Kategori berhasil diperbarui!');
     }
 
     public function destroyKategori($id) {
         Kategori::destroy($id);
-        return back()->with('success', 'Kategori berhasil dihapus!');
-    }
 
-    public function updateKategori(Request $request, $id) {
-        $request->validate([
-            'ket_kategori' => 'required'
-        ]);
-
-        \App\Models\Kategori::where('id_kategori', $id)->update([
-            'ket_kategori' => $request->ket_kategori
-        ]);
-
-        // Opsional: Catat di Log
-        \App\Models\LogAktivitas::create([
+        // Catat Log
+        LogAktivitas::create([
             'username' => session('username'),
-            'aktivitas' => 'Memperbarui kategori ID: ' . $id
+            'aktivitas' => 'Menghapus kategori (ID: ' . $id . ')'
         ]);
 
-        return back()->with('success', 'Kategori berhasil diperbarui!');
+        return back()->with('success', 'Kategori berhasil dihapus!');
     }
 
     // --- CRUD SISWA ---
@@ -69,7 +82,14 @@ class AdminController extends Controller
         Siswa::create([
             'nis' => $request->nis,
             'nama' => $request->nama,
+            'kelas' => $request->kelas,
             'password' => Hash::make($request->password),
+        ]);
+
+        // Catat Log
+        LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Mendaftarkan siswa baru: ' . $request->nama . ' (NIS: ' . $request->nis . ')'
         ]);
 
         return back()->with('success', 'Siswa berhasil didaftarkan!');
@@ -77,12 +97,66 @@ class AdminController extends Controller
 
     public function destroySiswa($nis) {
         Siswa::where('nis', $nis)->delete();
+
+        // Catat Log
+        LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Menghapus akun siswa dengan NIS: ' . $nis
+        ]);
+
         return back()->with('success', 'Akun siswa berhasil dihapus!');
     }
 
-    // --- TANGGAPI ---
+    // --- CRUD LOKASI ---
+    public function storeLokasi(Request $request) {
+        $request->validate(['nama_lokasi' => 'required']);
+        
+        Lokasi::create($request->all());
+
+        // Catat Log
+        LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Menambah lokasi baru: ' . $request->nama_lokasi
+        ]);
+
+        return back()->with('success', 'Lokasi berhasil ditambahkan');
+    }
+
+    public function updateLokasi(Request $request) {
+        $request->validate(['id_lokasi' => 'required', 'nama_lokasi' => 'required']);
+
+        Lokasi::where('id_lokasi', $request->id_lokasi)->update([
+            'nama_lokasi' => $request->nama_lokasi
+        ]);
+
+        // Catat Log
+        LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Mengubah nama lokasi menjadi: ' . $request->nama_lokasi
+        ]);
+
+        return back()->with('success', 'Lokasi berhasil diperbarui');
+    }
+
+    public function destroyLokasi($id) {
+        Lokasi::where('id_lokasi', $id)->delete();
+
+        // Catat Log
+        LogAktivitas::create([
+            'username' => session('username'),
+            'aktivitas' => 'Menghapus lokasi (ID: ' . $id . ')'
+        ]);
+
+        return back()->with('success', 'Lokasi berhasil dihapus');
+    }
+
+    // --- TANGGAPI / PROSES LAPORAN ---
     public function tanggapi(Request $request) {
-        $request->validate(['id_pelaporan' => 'required', 'status' => 'required', 'feedback' => 'required']);
+        $request->validate([
+            'id_pelaporan' => 'required', 
+            'status' => 'required', 
+            'feedback' => 'required'
+        ]);
 
         Aspirasi::updateOrCreate(
             ['id_aspirasi' => $request->id_pelaporan], 
@@ -93,29 +167,12 @@ class AdminController extends Controller
             ]
         );
 
+        // Catat Log
         LogAktivitas::create([
             'username' => session('username'),
-            'aktivitas' => 'Memberikan tanggapan pada laporan #' . $request->id_pelaporan
+            'aktivitas' => 'Menanggapi laporan #' . $request->id_pelaporan . ' dengan status: ' . $request->status
         ]);
 
         return back()->with('success', 'Tanggapan berhasil disimpan!');
-    }
-
-    // Tambahkan juga fungsi simpan, update, dan hapus untuk lokasi
-    public function storeLokasi(Request $request) {
-        Lokasi::create($request->all());
-        return back()->with('success', 'Lokasi berhasil ditambahkan');
-    }
-
-    public function updateLokasi(Request $request) {
-        Lokasi::where('id_lokasi', $request->id_lokasi)->update([
-            'nama_lokasi' => $request->nama_lokasi
-        ]);
-        return back()->with('success', 'Lokasi berhasil diperbarui');
-    }
-
-    public function destroyLokasi($id) {
-        Lokasi::where('id_lokasi', $id)->delete();
-        return back()->with('success', 'Lokasi berhasil dihapus');
     }
 }

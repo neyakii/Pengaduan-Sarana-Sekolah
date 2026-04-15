@@ -3,35 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Siswa;
-use App\Models\Lokasi;        // TAMBAHKAN INI
+use App\Models\Lokasi;
 use App\Models\Kategori;
 use App\Models\LogAktivitas;
 use App\Models\InputAspirasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class SiswaController extends Controller
 {
     public function dashboard() 
     {
-    if (!Session::has('login_siswa')) return redirect('/login');
-    
-    $siswa = Siswa::where('nis', session('nis'))->first();
-    $logs = LogAktivitas::where('nis', session('nis'))->orderBy('created_at', 'desc')->get();
-    $kategori = Kategori::all();
-    $lokasi = Lokasi::all(); // TAMBAHKAN INI
+        if (!Session::has('login_siswa')) return redirect('/login');
+        
+        $siswa = Siswa::where('nis', session('nis'))->first();
+        $logs = LogAktivitas::where('nis', session('nis'))->orderBy('created_at', 'desc')->get();
+        $kategori = Kategori::all();
+        $lokasi = Lokasi::all();
 
+        // Mengambil data pengaduan milik siswa yang sedang login
+        $pengaduan = InputAspirasi::with(['aspirasi', 'lokasi_relasi'])
+                    ->where('nis', session('nis'))
+                    ->orderBy('created_at', 'desc')
+                    ->get();
 
-        // TAMBAHKAN with('aspirasi') DI SINI
-    $pengaduan = InputAspirasi::with('aspirasi')
-                ->where('nis', session('nis'))
-                ->orderBy('created_at', 'desc')
-                ->get();
-
-    return view('siswa.dashboard', compact('siswa', 'pengaduan', 'kategori', 'lokasi', 'logs'));
+        return view('siswa.dashboard', compact('siswa', 'pengaduan', 'kategori', 'lokasi', 'logs'));
     }
 
-    // Contoh logic di Controller
+    // 1. UPDATE FOTO PROFIL
     public function updateFoto(Request $request) 
     {
         $request->validate([
@@ -39,18 +39,16 @@ class SiswaController extends Controller
         ]);
 
         if ($request->hasFile('foto_profile')) {
-            // Simpan file ke folder storage/app/public/profile_siswa
             $path = $request->file('foto_profile')->store('profile_siswa', 'public');
             
-            // Update database (Pastikan kolom foto_profile ada di tabel siswas)
             Siswa::where('nis', session('nis'))->update([
                 'foto_profile' => $path
             ]);
 
-            // Catat di log
+            // CATAT LOG
             LogAktivitas::create([
                 'nis' => session('nis'), 
-                'aktivitas' => 'Memperbarui foto profil'
+                'aktivitas' => 'Memperbarui foto profil baru'
             ]);
             
             return back()->with('success', 'Foto profil berhasil diperbarui!');
@@ -59,77 +57,96 @@ class SiswaController extends Controller
         return back()->with('error', 'Gagal mengunggah foto.');
     }
 
-    public function simpanAspirasi(Request $request) 
+    // 2. BUAT LAPORAN BARU
+    public function storeLapor(Request $request) 
     {
-        $request->validate(['id_kategori' => 'required', 'lokasi' => 'required', 'ket' => 'required', 'foto_kerusakan' => 'required|image']);
+        $request->validate([
+            'id_kategori' => 'required', 
+            'id_lokasi' => 'required', 
+            'ket' => 'required', 
+            'foto_kerusakan' => 'required|image|max:2048'
+        ]);
 
         if ($request->hasFile('foto_kerusakan')) {
-            $file = $request->file('foto_kerusakan');
-            $nama_foto = time() . '_' . session('nis') . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('storage/aspirasi'), $nama_foto);
+            $path = $request->file('foto_kerusakan')->store('aspirasi', 'public');
             
             InputAspirasi::create([
                 'nis' => session('nis'),
                 'id_kategori' => $request->id_kategori,
-                'lokasi' => $request->lokasi,
+                'id_lokasi' => $request->id_lokasi,
                 'ket' => $request->ket,
-                'foto' => 'aspirasi/' . $nama_foto
+                'foto' => $path
             ]);
 
-            LogAktivitas::create(['nis' => session('nis'), 'aktivitas' => 'Mengirim laporan pengaduan baru']);
+            // Ambil nama lokasi untuk pesan log yang lebih jelas
+            $nama_lokasi = Lokasi::find($request->id_lokasi)->nama_lokasi ?? 'Lokasi tidak diketahui';
+
+            // CATAT LOG
+            LogAktivitas::create([
+                'nis' => session('nis'), 
+                'aktivitas' => 'Mengirim laporan pengaduan baru di: ' . $nama_lokasi
+            ]);
 
             return back()->with('success', 'Laporan berhasil dikirim!');
         }
     }
 
-    // Update Laporan
-    public function updateLapor(Request $request, $id) {
-        // Cari berdasarkan id_pelaporan
-        $pengaduan = \App\Models\InputAspirasi::findOrFail($id);
+    // 3. UPDATE LAPORAN (EDIT)
+    public function updateLapor(Request $request, $id) 
+    {
+        $request->validate([
+            'id_kategori' => 'required', 
+            'id_lokasi' => 'required', 
+            'ket' => 'required'
+        ]);
+
+        $pengaduan = InputAspirasi::findOrFail($id);
         
+        // Proteksi agar siswa tidak bisa edit laporan orang lain
         if($pengaduan->nis != session('nis')) {
             return back()->with('error', 'Akses ditolak.');
         }
 
         $pengaduan->id_kategori = $request->id_kategori;
-        $pengaduan->lokasi = $request->lokasi;
+        $pengaduan->id_lokasi = $request->id_lokasi;
         $pengaduan->ket = $request->ket;
 
         if ($request->hasFile('foto_kerusakan')) {
-            $file = $request->file('foto_kerusakan');
-            $nama_foto = time() . '_' . session('nis') . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('storage/aspirasi'), $nama_foto);
-            $pengaduan->foto = 'aspirasi/' . $nama_foto;
+            $path = $request->file('foto_kerusakan')->store('aspirasi', 'public');
+            $pengaduan->foto = $path;
         }
 
         $pengaduan->save();
 
-        // --- TAMBAHKAN LOG DI SINI ---
-        \App\Models\LogAktivitas::create([
+        $nama_lokasi = Lokasi::find($request->id_lokasi)->nama_lokasi ?? 'Lokasi tidak diketahui';
+
+        // CATAT LOG
+        LogAktivitas::create([
             'nis' => session('nis'),
-            'aktivitas' => 'Memperbarui laporan di lokasi: ' . $request->lokasi
+            'aktivitas' => 'Memperbarui data laporan di: ' . $nama_lokasi
         ]);
 
         return back()->with('success', 'Laporan berhasil diperbarui!');
     }
 
-    // Hapus Laporan
-    public function destroyLapor($id) {
-        $pengaduan = \App\Models\InputAspirasi::findOrFail($id);
+    // 4. HAPUS LAPORAN (BATAL)
+    public function destroyLapor($id) 
+    {
+        $pengaduan = InputAspirasi::with('lokasi_relasi')->findOrFail($id);
         
         if($pengaduan->nis != session('nis')) {
             return back()->with('error', 'Akses ditolak.');
         }
 
-        // Simpan lokasi sementara untuk keperluan catatan log sebelum data dihapus
-        $lokasi_lama = $pengaduan->lokasi;
+        // Ambil nama lokasi sebelum dihapus untuk log
+        $lokasi_lama = $pengaduan->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak diketahui';
 
         $pengaduan->delete();
 
-        // --- TAMBAHKAN LOG DI SINI ---
-        \App\Models\LogAktivitas::create([
+        // CATAT LOG
+        LogAktivitas::create([
             'nis' => session('nis'),
-            'aktivitas' => 'Membatalkan laporan di lokasi: ' . $lokasi_lama
+            'aktivitas' => 'Membatalkan/Menghapus laporan di: ' . $lokasi_lama
         ]);
 
         return back()->with('success', 'Laporan berhasil dibatalkan.');

@@ -194,33 +194,60 @@
         <div class="tab-content" id="v-pills-tabContent">
             <!-- TAB 1: DASHBOARD -->
             <div class="tab-pane fade show active" id="pills-dash" role="tabpanel">
-                <div class="row g-4 mb-5">
-                    <div class="col-md-4">
+                <!-- Grid diubah menjadi col-md-3 agar 4 card sejajar -->
+                <div class="row g-3 mb-5"> 
+                    <!-- CARD TOTAL -->
+                    <div class="col-md-3 col-6">
                         <div class="glass-card text-center">
                             <p class="text-white-50 small mb-1">TOTAL LAPORAN</p>
                             <h2 class="fw-800 mb-0 text-white">{{ count($laporan) }}</h2>
                         </div>
                     </div>
-                    <div class="col-md-4">
+
+                    <!-- CARD MENUNGGU -->
+                    <div class="col-md-3 col-6">
                         <div class="glass-card text-center" style="border-bottom: 3px solid #fbbf24;">
                             <p class="text-warning small mb-1">MENUNGGU</p>
-                            <h2 class="fw-800 mb-0 text-warning">{{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? 'Menunggu') == 'Menunggu')->count() }}</h2>
+                            <h2 class="fw-800 mb-0 text-warning">
+                                {{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? 'Menunggu') == 'Menunggu')->count() }}
+                            </h2>
                         </div>
                     </div>
-                    <div class="col-md-4">
+
+                    <!-- CARD PROSES -->
+                    <div class="col-md-3 col-6">
+                        <div class="glass-card text-center" style="border-bottom: 3px solid #3b82f6;">
+                            <p class="text-primary small mb-1">PROSES</p>
+                            <h2 class="fw-800 mb-0 text-primary">
+                                {{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? '') == 'Proses')->count() }}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- CARD SELESAI -->
+                    <div class="col-md-3 col-6">
                         <div class="glass-card text-center" style="border-bottom: 3px solid #4ade80;">
                             <p class="text-success small mb-1">SELESAI</p>
-                            <h2 class="fw-800 mb-0 text-success">{{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? '') == 'Selesai')->count() }}</h2>
+                            <h2 class="fw-800 mb-0 text-success">
+                                {{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? '') == 'Selesai')->count() }}
+                            </h2>
                         </div>
                     </div>
                 </div>
+
                 <div class="row g-4">
                     <div class="col-lg-8">
                         <div class="glass-card">
                             <h6 class="fw-800 mb-4 text-white">Aktivitas Pelaporan Terkini</h6>
                             <div class="table-responsive">
                                 <table class="table text-white custom-table">
-                                    <thead><tr><th>Siswa</th><th>Laporan</th><th>Status</th></tr></thead>
+                                    <thead>
+                                        <tr>
+                                            <th>Siswa</th>
+                                            <th>Laporan</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
                                         @foreach($laporan->take(5) as $l)
                                         <tr>
@@ -228,7 +255,9 @@
                                             <td class="text-white-50 small">{{ Str::limit($l->ket, 35) }}</td>
                                             <td>
                                                 @php $st = $l->aspirasi->status ?? 'Menunggu'; @endphp
-                                                <span class="badge-modern {{ $st == 'Selesai' ? 'st-done' : ($st == 'Proses' ? 'st-process' : 'st-waiting') }}">{{ $st }}</span>
+                                                <span class="badge-modern {{ $st == 'Selesai' ? 'st-done' : ($st == 'Proses' ? 'st-process' : 'st-waiting') }}">
+                                                    {{ $st }}
+                                                </span>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -245,7 +274,9 @@
                                 <div class="log-item">
                                     <p class="small fw-700 mb-0 text-info">{{ $log->username ?? $log->nis }}</p>
                                     <p class="small text-white-50 mb-0">{{ $log->aktivitas }}</p>
-                                    <small class="opacity-50 text-white" style="font-size: 0.65rem;">{{ $log->created_at->diffForHumans() }}</small>
+                                    <small class="opacity-50 text-white" style="font-size: 0.65rem;">
+                                        {{ $log->created_at->diffForHumans() }}
+                                    </small>
                                 </div>
                                 @empty
                                 <p class="text-white-50 small">Tidak ada log.</p>

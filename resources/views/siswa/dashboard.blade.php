@@ -422,7 +422,7 @@
                                     <tr>
                                         <td colspan="3" class="text-center py-5">
                                             <i class="bi bi-clipboard-x fs-1 text-white-50 d-block mb-3"></i>
-                                            <p class="text-white-50 small">Belum ada laporan yang diajukan.</p>
+                                            <p class="text-black-50 small">Belum ada laporan yang diajukan.</p>
                                         </td>
                                     </tr>
                                     @endforelse
@@ -452,7 +452,25 @@
             </div>
         </div>
     </div>
-
+<!-- Tambahkan ini di bagian atas halaman untuk melihat pesan kesalahan -->
+<div class="container mt-3">
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 15px; background: rgba(220, 53, 69, 0.2); color: white; border: 1px solid rgba(220, 53, 69, 0.4); backdrop-filter: blur(10px);">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li><i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    
+    @if(session('error'))
+        <div class="alert alert-danger" style="border-radius: 15px;">
+            {{ session('error') }}
+        </div>
+    @endif
+</div>
     <!-- MODAL LAPOR BARU -->
     <div class="modal fade" id="modalLapor" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -490,6 +508,10 @@
                             <div class="col-12">
                                 <label class="small text-white mb-2 fw-600">Unggah Foto Bukti</label>
                                 <input type="file" name="foto_kerusakan" class="form-control" required>
+                                <!-- Tambahkan teks ini -->
+                                <small class="text-white-50" style="font-size: 0.7rem;">
+                                    <i class="bi bi-info-circle me-1"></i> Maksimal ukuran foto: 2MB (Jika lebih, laporan tidak akan terkirim).
+                                </small>
                             </div>
                         </div>
                     </div>

@@ -60,34 +60,45 @@ class SiswaController extends Controller
     // 2. BUAT LAPORAN BARU
     public function storeLapor(Request $request) 
     {
+        // Tambahkan pesan custom agar kita tahu persis apa yang salah
         $request->validate([
             'id_kategori' => 'required', 
             'id_lokasi' => 'required', 
             'ket' => 'required', 
-            'foto_kerusakan' => 'required|image|max:2048'
+            'foto_kerusakan' => 'required|image|mimes:jpeg,png,jpg|max:2048' // Maksimal 2MB
+        ], [
+            'foto_kerusakan.max' => 'Ukuran foto terlalu besar! Maksimal adalah 2MB.',
+            'foto_kerusakan.image' => 'File yang diunggah harus berupa gambar.',
+            'required' => 'Kolom :attribute tidak boleh kosong.'
         ]);
 
-        if ($request->hasFile('foto_kerusakan')) {
-            $path = $request->file('foto_kerusakan')->store('aspirasi', 'public');
+        try {
+            if ($request->hasFile('foto_kerusakan')) {
+                $path = $request->file('foto_kerusakan')->store('aspirasi', 'public');
+                
+                InputAspirasi::create([
+                    'nis' => session('nis'),
+                    'id_kategori' => $request->id_kategori,
+                    'id_lokasi' => $request->id_lokasi,
+                    'ket' => $request->ket,
+                    'foto' => $path
+                ]);
+
+                $nama_lokasi = Lokasi::find($request->id_lokasi)->nama_lokasi ?? 'Lokasi tidak diketahui';
+
+                LogAktivitas::create([
+                    'nis' => session('nis'), 
+                    'aktivitas' => 'Mengirim laporan pengaduan baru di: ' . $nama_lokasi
+                ]);
+
+                return back()->with('success', 'Laporan berhasil dikirim!');
+            }
             
-            InputAspirasi::create([
-                'nis' => session('nis'),
-                'id_kategori' => $request->id_kategori,
-                'id_lokasi' => $request->id_lokasi,
-                'ket' => $request->ket,
-                'foto' => $path
-            ]);
-
-            // Ambil nama lokasi untuk pesan log yang lebih jelas
-            $nama_lokasi = Lokasi::find($request->id_lokasi)->nama_lokasi ?? 'Lokasi tidak diketahui';
-
-            // CATAT LOG
-            LogAktivitas::create([
-                'nis' => session('nis'), 
-                'aktivitas' => 'Mengirim laporan pengaduan baru di: ' . $nama_lokasi
-            ]);
-
-            return back()->with('success', 'Laporan berhasil dikirim!');
+            return back()->with('error', 'File foto tidak terdeteksi.');
+            
+        } catch (\Exception $e) {
+            // Jika ada error database atau sistem, pesan ini akan muncul
+            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
         }
     }
 

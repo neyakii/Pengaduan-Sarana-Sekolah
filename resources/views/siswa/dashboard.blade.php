@@ -70,6 +70,56 @@
             transition: all 0.3s ease;
         }
 
+         /* --- PERBAIKAN SCROLL TABEL --- */
+        .table-scroll-container {
+            max-height: 500px; 
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-top: 10px;
+        }
+
+        /* Scrollbar Style */
+        .table-scroll-container::-webkit-scrollbar { width: 5px; }
+        .table-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .table-scroll-container::-webkit-scrollbar-thumb { 
+            background: rgba(59, 130, 246, 0.5); 
+            border-radius: 10px; 
+        }
+
+        /* Sticky Header Fix */
+        .custom-table thead th {
+            position: sticky;
+            top: -1px; /* Menutup celah saat scroll */
+            background: #0b1425; /* Warna solid agar teks tidak tumpuk */
+            z-index: 20;
+            border-bottom: 1px solid var(--border-glass);
+            padding: 15px !important;
+            color: rgba(255,255,255,0.6) !important;
+        }
+
+        /* Card inside table fix */
+        .feedback-box {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 3px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .img-thumbnail-custom {
+            width: 100px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            transition: 0.3s;
+        }
+
+        .img-thumbnail-custom:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-blue);
+        }
+
         .profile-img-wrapper {
             position: relative;
             display: inline-block;
@@ -272,80 +322,115 @@
                         </div>
                     </div>
                 </div>
-
+            <!-- TABEL LAPORAN -->
                 <div class="glass-card">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-800 mb-0">Laporan Saya</h5>
-                        <span class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 small" style="font-size: 0.7rem;">Real-time Update</span>
+                        <div>
+                            <h5 class="fw-800 mb-0">Laporan Saya</h5>
+                            <p class="text-white-50 small mb-0">Riwayat pengaduan fasilitas sekolah Anda</p>
+                        </div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 small" style="font-size: 0.7rem; border: 1px solid rgba(59,130,246,0.2)">
+                            <i class="bi bi-arrow-repeat me-1"></i> Auto Refresh
+                        </span>
                     </div>
                     
-                    <div class="table-responsive">
-                        <table class="table custom-table text-white">
-                            <thead>
-                                <tr class="text-black-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">
-                                    <th>Bukti</th>
-                                    <th>Detail Kerusakan</th>
-                                    <th class="text-end">Status</th>
-                                </tr>
-                            </thead>
-                            <!-- Cari bagian <tbody> di file dashboard kamu dan ganti dengan ini -->
-                            <tbody>
-                                @forelse($pengaduan as $p)
-                                @php
-                                    $status = $p->aspirasi->status ?? 'Menunggu';
-                                    $badgeClass = ($status == 'Selesai') ? 'st-selesai' : (($status == 'Proses') ? 'st-proses' : 'st-menunggu');
-                                @endphp
-                                <tr>
-                                    <td style="width: 100px;">
-                                        <img src="{{ asset('storage/'.$p->foto) }}" class="rounded-3 shadow" style="width: 70px; height: 70px; object-fit: cover;">
-                                    </td>
-                                    <td>
-                                        <!-- PERBAIKAN: text-black agar tulisan kelihatan -->
-                                        <div class="fw-700 mb-1 text-black">{{ $p->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak ada' }}</div>
-                                        <p class="text-black-50 small mb-2" style="line-height: 1.4;">{{ $p->ket }}</p>
-                                        
-                                        @if($p->aspirasi && $p->aspirasi->feedback)
-                                            <div class="p-2 mb-2 rounded bg-primary bg-opacity-10 border-start border-primary border-3" style="font-size: 0.75rem;">
-                                                <i class="bi bi-chat-left-dots-fill me-1 text-primary"></i>
-                                                <span class="text-black">{{ $p->aspirasi->feedback }}</span>
+                    <div class="table-scroll-container">
+                        <div class="table-responsive">
+                            <table class="table custom-table text-white mb-0">
+                                <thead>
+                                    <tr class="text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">
+                                        <th class="border-0">Laporan</th>
+                                        <th class="border-0">Detail & Tanggapan</th>
+                                        <th class="border-0 text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($pengaduan as $p)
+                                    @php
+                                        $status = $p->aspirasi->status ?? 'Menunggu';
+                                        $badgeClass = ($status == 'Selesai') ? 'st-selesai' : (($status == 'Proses') ? 'st-proses' : 'st-menunggu');
+                                    @endphp
+                                    <tr>
+                                        <!-- Kolom Foto & Info Dasar -->
+                                        <td style="width: 140px;">
+                                            <div class="position-relative">
+                                                <label class="d-block text-black-50 fw-bold mb-2" style="font-size: 0.6rem; text-transform: uppercase;">Bukti Kerusakan</label>
+                                                <a href="{{ asset('storage/'.$p->foto) }}" target="_blank">
+                                                    <img src="{{ asset('storage/'.$p->foto) }}" class="img-thumbnail-custom shadow-sm">
+                                                </a>
+                                                <div class="mt-2 text-black-50" style="font-size: 0.65rem;">
+                                                    <i class="bi bi-calendar3 me-1"></i> {{ $p->created_at->format('d M Y') }}
+                                                </div>
                                             </div>
-                                        @endif
+                                        </td>
 
-                                        <!-- ACTION BUTTONS (GANTI id_pengaduan ke id_pelaporan) -->
-                                        @if($status == 'Menunggu')
-                                        <div class="mt-2">
-                                            <button class="btn btn-sm btn-outline-info me-1 py-1 px-3 rounded-pill" 
-                                                    style="font-size: 0.7rem;"
-                                                    onclick="editLaporan('{{ $p->id_pelaporan }}', '{{ $p->id_kategori }}', '{{ $p->id_lokasi }}', '{{ $p->ket }}')">
-                                                <i class="bi bi-pencil-square me-1"></i> Edit
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill" 
-                                                    style="font-size: 0.7rem;"
-                                                    onclick="confirmDelete('{{ $p->id_pelaporan }}')">
-                                                <i class="bi bi-trash me-1"></i> Batal
-                                            </button>
-                                        </div>
-                                        @endif
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="badge-modern {{ $badgeClass }}">{{ $status }}</span>
-                                        <div class="text-black-50 mt-2" style="font-size: 0.65rem;">{{ $p->created_at->format('d M Y') }}</div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="3" class="text-center py-5">
-                                        <p class="text-black-50 small">Belum ada laporan yang diajukan.</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                        <!-- Kolom Detail & Tanggapan -->
+                                        <td>
+                                            <div class="mb-1">
+                                                <span class="badge bg-balck bg-opacity-10 text-black-50 fw-normal mb-2" style="font-size: 0.65rem;">
+                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $p->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak diketahui' }}
+                                                </span>
+                                                <p class="text-black opacity-75 small mb-0" style="line-height: 1.5; max-width: 400px;">
+                                                    {{ $p->ket }}
+                                                </p>
+                                            </div>
+
+                                            @if($p->aspirasi)
+                                            <div class="feedback-box">
+                                                <div class="d-flex align-items-start gap-2 mb-2">
+                                                    <i class="bi bi-chat-square-text-fill text-primary"></i>
+                                                    <div>
+                                                        <label class="d-block text-primary fw-bold" style="font-size: 0.7rem; text-transform: uppercase;">Respon Administrator</label>
+                                                        <p class="text-black-50 small mb-0">{{ $p->aspirasi->feedback ?? 'Sedang ditinjau...' }}</p>
+                                                    </div>
+                                                </div>
+
+                                                @if($p->aspirasi->foto)
+                                                <div class="mt-3 pt-2 border-top border-white border-opacity-10">
+                                                    <label class="d-block text-success fw-bold mb-2" style="font-size: 0.65rem; text-transform: uppercase;">
+                                                        <i class="bi bi-check-all me-1"></i> Bukti Hasil Perbaikan
+                                                    </label>
+                                                    <a href="{{ asset('storage/'.$p->aspirasi->foto) }}" target="_blank">
+                                                        <img src="{{ asset('storage/'.$p->aspirasi->foto) }}" class="img-thumbnail-custom" style="width: 80px; height: 60px;">
+                                                    </a>
+                                                </div>
+                                                @endif
+                                            </div>
+                                            @endif
+
+                                            <!-- Tombol Aksi -->
+                                            @if($status == 'Menunggu')
+                                            <div class="mt-3 d-flex gap-2">
+                                                <button class="btn btn-sm btn-outline-info py-1 px-3 rounded-pill" style="font-size: 0.65rem;"
+                                                        onclick="editLaporan('{{ $p->id_pelaporan }}', '{{ $p->id_kategori }}', '{{ $p->id_lokasi }}', '{{ $p->ket }}')">
+                                                    <i class="bi bi-pencil me-1"></i> Edit
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill" style="font-size: 0.65rem;"
+                                                        onclick="confirmDelete('{{ $p->id_pelaporan }}')">
+                                                    <i class="bi bi-x-lg me-1"></i> Batal
+                                                </button>
+                                            </div>
+                                            @endif
+                                        </td>
+
+                                        <!-- Kolom Status -->
+                                        <td class="text-end">
+                                            <span class="badge-modern {{ $badgeClass }}">{{ $status }}</span>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5">
+                                            <i class="bi bi-clipboard-x fs-1 text-white-50 d-block mb-3"></i>
+                                            <p class="text-white-50 small">Belum ada laporan yang diajukan.</p>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL PROFILE -->
     <div class="modal fade" id="modalProfile" tabindex="-1">

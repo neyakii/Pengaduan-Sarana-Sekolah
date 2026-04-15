@@ -61,14 +61,14 @@ return new class extends Migration
         // 6. Tabel Aspirasi (Tanggapan/Status)
         Schema::create('aspirasi', function (Blueprint $table) {
             $table->bigIncrements('id_aspirasi');
+            $table->unsignedBigInteger('id_pelaporan'); // <--- TAMBAHKAN INI
             $table->enum('status', ['Menunggu', 'Proses', 'Selesai'])->default('Menunggu');
-            $table->unsignedBigInteger('id_kategori');
             $table->text('feedback')->nullable();
-            $table->string('foto', 255)->nullable(); // BARU: Menambah kolom foto di aspirasi
+            $table->string('foto', 255)->nullable(); 
             $table->timestamps();
 
-            // Foreign Key
-            $table->foreign('id_kategori')->references('id_kategori')->on('kategori')->onDelete('cascade');
+            // Foreign Key ke tabel input_aspirasi
+            $table->foreign('id_pelaporan')->references('id_pelaporan')->on('input_aspirasi')->onDelete('cascade');
         });
 
         // 7. Tabel Log Aktivitas

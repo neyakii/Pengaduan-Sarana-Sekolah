@@ -9,9 +9,7 @@ class Aspirasi extends Model
 {
     protected $table = 'aspirasi';
     protected $primaryKey = 'id_aspirasi';
-    protected $fillable = ['id_aspirasi', 'status', 'id_kategori', 'feedback'];
-    // Catatan: Di ERD kamu id_aspirasi tidak auto-increment, tapi biasanya id_aspirasi 
-    // akan merujuk ke id_pelaporan agar kita tahu laporan mana yang ditanggapi.
+    protected $fillable = ['id_pelaporan', 'status', 'feedback', 'foto'];
 
     public function tanggapi(Request $request) {
         $request->validate([

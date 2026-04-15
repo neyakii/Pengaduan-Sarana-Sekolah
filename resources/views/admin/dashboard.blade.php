@@ -240,7 +240,7 @@
                         <div class="glass-card">
                             <h6 class="fw-800 mb-4 text-white">Aktivitas Pelaporan Terkini</h6>
                             <div class="table-responsive">
-                                <table class="table text-white custom-table">
+                                <table class="table text-black custom-table">
                                     <thead>
                                         <tr>
                                             <th>Siswa</th>
@@ -252,7 +252,7 @@
                                         @foreach($laporan->take(5) as $l)
                                         <tr>
                                             <td class="fw-700">{{ $l->siswa->nama }}</td>
-                                            <td class="text-white-50 small">{{ Str::limit($l->ket, 35) }}</td>
+                                            <td class="text-black-50 small">{{ Str::limit($l->ket, 35) }}</td>
                                             <td>
                                                 @php $st = $l->aspirasi->status ?? 'Menunggu'; @endphp
                                                 <span class="badge-modern {{ $st == 'Selesai' ? 'st-done' : ($st == 'Proses' ? 'st-process' : 'st-waiting') }}">
@@ -288,32 +288,84 @@
             </div>
 
             <!-- TAB 2: LAPORAN -->
-            <div class="tab-pane fade" id="pills-laporan" role="tabpanel">
-                <div class="glass-card">
-                    <h5 class="fw-800 mb-4 text-white">Manajemen Pengaduan</h5>
-                    <div class="table-responsive">
-                        <table class="table text-white custom-table">
-                            <thead><tr><th>Info Siswa</th><th>Bukti</th><th>Keterangan</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
-                            <tbody>
-                                @foreach($laporan as $l)
-                                <tr>
-                                    <td><div class="fw-700 small">{{ $l->siswa->nama }}</div><div class="text-white-50 small" style="font-size: 0.7rem;">NIS: {{ $l->nis }}</div></td>
-                                    <td><img src="{{ asset('storage/'.$l->foto) }}" class="img-report shadow"></td>
-                                    <td class="text-white-50 small">{{ Str::limit($l->ket, 50) }}</td>
-                                    <td>
-                                        @php $st = $l->aspirasi->status ?? 'Menunggu'; @endphp
-                                        <span class="badge-modern {{ $st == 'Selesai' ? 'st-done' : ($st == 'Proses' ? 'st-process' : 'st-waiting') }}">{{ $st }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-primary-custom btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalTanggapi{{ $l->id_pelaporan }}">Kelola</button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<div class="tab-pane fade" id="pills-laporan" role="tabpanel">
+    <div class="glass-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-800 mb-0 text-white">Manajemen Pengaduan</h5>
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill small">
+                <i class="bi bi-filter-left me-1"></i> Urutan Terbaru
+            </span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table text-white custom-table">
+                <thead>
+                    <tr class="text-white-50 small" style="text-transform: uppercase; letter-spacing: 1px;">
+                        <th>Bukti</th>
+                        <th>Pelapor & Kategori</th>
+                        <th>Detail Kerusakan & Lokasi</th>
+                        <th>Status</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($laporan as $l)
+                    <tr>
+                        <!-- Bukti Foto -->
+                        <td style="width: 80px;">
+                            <div class="position-relative">
+                                <img src="{{ asset('storage/'.$l->foto) }}" class="img-report shadow-sm border border-white border-opacity-10">
+                            </div>
+                        </td>
+
+                        <!-- Info Siswa & Kategori -->
+                        <td>
+                            <div class="fw-700 text-black mb-1">
+                                <i class="bi bi-person-circle me-1 text-primary-emphasis"></i> {{ $l->siswa->nama }}
+                            </div>
+                            <div class="badge bg-white bg-opacity-10 text-black-50 fw-normal" style="font-size: 0.65rem;">
+                                <i class="bi bi-tag-fill me-1"></i> {{ $l->kategori->ket_kategori ?? 'Umum' }}
+                            </div>
+                        </td>
+
+                        <!-- Keterangan & Lokasi (INI YANG DITAMBAHKAN) -->
+                        <td>
+                            <div class="text-black small fw-600 mb-1">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $l->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak ada' }}
+                            </div>
+                            <p class="text-black-50 small mb-0" style="max-width: 250px; line-height: 1.4;">
+                                {{ Str::limit($l->ket, 60) }}
+                            </p>
+                        </td>
+
+                        <!-- Status Badge -->
+                        <td>
+                            @php $st = $l->aspirasi->status ?? 'Menunggu'; @endphp
+                            <div class="d-flex flex-column align-items-start">
+                                <span class="badge-modern {{ $st == 'Selesai' ? 'st-done' : ($st == 'Proses' ? 'st-process' : 'st-waiting') }}">
+                                    {{ $st }}
+                                </span>
+                                <small class="text-black-50 mt-1" style="font-size: 0.6rem;">
+                                    <i class="bi bi-calendar3 me-1"></i> {{ $l->created_at->format('d/m/y') }}
+                                </small>
+                            </div>
+                        </td>
+
+                        <!-- Tombol Kelola -->
+                        <td class="text-center">
+                            <button class="btn btn-primary-custom btn-sm px-3 shadow-sm" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#modalTanggapi{{ $l->id_pelaporan }}">
+                                <i class="bi bi-gear-fill me-1"></i> Kelola
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
             <!-- TAB 3: KATEGORI -->
             <div class="tab-pane fade" id="pills-kategori" role="tabpanel">
@@ -475,16 +527,25 @@
     @foreach($laporan as $l)
     <div class="modal fade" id="modalTanggapi{{ $l->id_pelaporan }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <form action="/admin/tanggapi" method="POST" class="modal-content">
+            <!-- TAMBAHKAN enctype="multipart/form-data" UNTUK UPLOAD FILE -->
+            <form action="/admin/tanggapi" method="POST" enctype="multipart/form-data" class="modal-content">
                 @csrf
                 <input type="hidden" name="id_pelaporan" value="{{ $l->id_pelaporan }}">
                 <div class="modal-body p-4">
                     <div class="row g-4">
                         <div class="col-md-5">
-                            <img src="{{ asset('storage/'.$l->foto) }}" class="img-fluid rounded-4 shadow border border-white border-opacity-10">
+                            <label class="small text-white-50 mb-2">Foto Laporan Siswa:</label>
+                            <img src="{{ asset('storage/'.$l->foto) }}" class="img-fluid rounded-4 shadow border border-white border-opacity-10 mb-3">
+                            
+                            <!-- Tampilkan foto bukti jika sudah ada sebelumnya -->
+                            @if(isset($l->aspirasi->foto))
+                            <label class="small text-success mb-2">Foto Bukti Perbaikan Saat Ini:</label>
+                            <img src="{{ asset('storage/'.$l->aspirasi->foto) }}" class="img-fluid rounded-4 border border-success border-opacity-50">
+                            @endif
                         </div>
                         <div class="col-md-7">
                             <h5 class="fw-800 text-white mb-3">Kelola Laporan</h5>
+                            
                             <div class="mb-3">
                                 <label class="small text-white-50 mb-2">Update Status</label>
                                 <select name="status" class="form-select">
@@ -493,11 +554,20 @@
                                     <option value="Selesai" {{ ($l->aspirasi->status ?? '') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
                                 </select>
                             </div>
+
+                            <!-- INPUT FILE UNTUK BUKTI PERBAIKAN -->
+                            <div class="mb-3">
+                                <label class="small text-white-50 mb-2">Unggah Bukti Perbaikan (Opsional)</label>
+                                <input type="file" name="foto_bukti" class="form-control" accept="image/*">
+                                <small class="text-white-50" style="font-size: 0.7rem;">Format: JPG, PNG, JPEG. Maks 2MB</small>
+                            </div>
+
                             <div class="mb-4">
                                 <label class="small text-white-50 mb-2">Tanggapan Admin</label>
                                 <textarea name="feedback" class="form-control" rows="4" required>{{ $l->aspirasi->feedback ?? '' }}</textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary-custom w-100">Simpan Tanggapan</button>
+                            
+                            <button type="submit" class="btn btn-primary-custom w-100">Simpan Tanggapan & Foto</button>
                         </div>
                     </div>
                 </div>
@@ -505,7 +575,7 @@
         </div>
     </div>
     @endforeach
-
+    
     <!-- MODAL TAMBAH SISWA -->
     <div class="modal fade" id="modalAddSiswa" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

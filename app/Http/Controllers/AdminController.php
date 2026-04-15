@@ -151,28 +151,46 @@ class AdminController extends Controller
     }
 
     // --- TANGGAPI / PROSES LAPORAN ---
-    public function tanggapi(Request $request) {
+   public function tanggapi(Request $request)
+    {
         $request->validate([
-            'id_pelaporan' => 'required', 
-            'status' => 'required', 
-            'feedback' => 'required'
+            'id_pelaporan' => 'required',
+            'status' => 'required',
+            'feedback' => 'required',
+            'foto_bukti' => 'image|mimes:jpeg,png,jpg|max:2048' 
         ]);
 
-        Aspirasi::updateOrCreate(
-            ['id_aspirasi' => $request->id_pelaporan], 
-            [
-                'status' => $request->status,
-                'id_kategori' => $request->id_kategori,
-                'feedback' => $request->feedback
-            ]
-        );
+        // Menggunakan updateOrCreate agar lebih ringkas
+        // Mencari berdasarkan id_pelaporan, jika tidak ada maka buat baru
+        $aspirasi = Aspirasi::firstOrNew(['id_pelaporan' => $request->id_pelaporan]);
+        
+        $aspirasi->status = $request->status;
+        $aspirasi->feedback = $request->feedback;
 
-        // Catat Log
+        // LOGIC UPLOAD FOTO
+        if ($request->hasFile('foto_bukti')) {
+            // Hapus foto lama jika ada di storage
+            if ($aspirasi->foto && \Storage::disk('public')->exists($aspirasi->foto)) {
+                \Storage::disk('public')->delete($aspirasi->foto);
+            }
+
+            // Simpan foto baru
+            $path = $request->file('foto_bukti')->store('bukti_aspirasi', 'public');
+            $aspirasi->foto = $path; 
+        }
+
+        $aspirasi->save();
+        
+        // Log yang lebih detail agar admin tahu "apa" yang ditulis
+        $detailLog = "Menanggapi laporan #{$request->id_pelaporan}. " .
+                    "Status: {$request->status}. " .
+                    "Tanggapan: " . \Str::limit($request->feedback, 50);
+
         LogAktivitas::create([
             'username' => session('username'),
-            'aktivitas' => 'Menanggapi laporan #' . $request->id_pelaporan . ' dengan status: ' . $request->status
+            'aktivitas' => $detailLog
         ]);
 
-        return back()->with('success', 'Tanggapan berhasil disimpan!');
+        return back()->with('success', 'Tanggapan dan bukti berhasil disimpan!');
     }
 }

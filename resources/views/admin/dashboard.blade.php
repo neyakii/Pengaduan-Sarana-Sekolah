@@ -1,147 +1,279 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <!-- ... (Meta dan Link Bootstrap tetap sama) ... -->
+    <!-- 
+    ============================================================
+    BAGIAN: META & DEPENDENSI UTAMA (SISWA DASHBOARD)
+    ============================================================
+    - Halaman ini adalah dashboard untuk siswa (pengguna biasa)
+    - Fitur: Melihat status laporan, membuat laporan baru, edit laporan (jika masih Menunggu)
+    - Dependensi: Bootstrap 5, Font Google (Plus Jakarta Sans), Bootstrap Icons, SweetAlert2
+    - Author: Admin Sistem
+    - Terakhir diupdate: 2026
+    ============================================================
+    -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Pengaduan Sarana</title>
+    <title>Siswa Dashboard - Pengaduan Sarana</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <!-- 1. TAMBAHKAN CSS DATATABLES -->
-    <link rel="stylesheet" href="//cdn.datatables.net/2.3.7/css/dataTables.dataTables.min.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* ... (CSS Asli Anda tetap di sini) ... */
+        /* 
+        ============================================================
+        VARIABEL CSS GLOBAL (WARNA & TEMA)
+        ============================================================
+        - Menggunakan tema gelap (dark mode) dengan efek glassmorphism
+        - Ubah nilai variabel di bawah untuk mengganti warna tema
+        ============================================================
+        */
         :root {
-            --bg-color: #050b18;
-            --primary-blue: #3b82f6;
-            --accent-purple: #a855f7;
-            --card-glass: rgba(255, 255, 255, 0.03);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 280px;
+            --bg-color: #050b18;          /* Warna latar belakang utama (gelap) */
+            --primary-blue: #3b82f6;      /* Warna biru untuk tombol dan aksen */
+            --accent-purple: #a855f7;     /* Warna ungu untuk efek gradien */
+            --card-glass: rgba(255, 255, 255, 0.03);  /* Efek transparan untuk card */
+            --border-glass: rgba(255, 255, 255, 0.08); /* Warna border efek kaca */
+            --dropdown-bg: #111827;       /* Latar belakang dropdown select */
         }
 
+        /* Reset & Global Styles */
         body {
             background-color: var(--bg-color);
             color: #ffffff;
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
 
-        /* Menata kontainer pagination agar rapi */
-        .dt-paging {
-            margin-top: 1.5rem !important;
-            text-align: right !important;
-        }
-
-        /* Style umum tombol pagination */
-        .dt-paging-button {
-            background: rgba(255, 255, 255, 0.86) !important;
-            border: 1px solid var(--border-glass) !important;
-            color: white !important;
-            border-radius: 8px !important;
-            margin: 0 3px !important;
-            padding: 5px 12px !important;
-            transition: 0.3s !important;
-        }
-
-        /* Style tombol saat hover */
-        .dt-paging-button:hover {
-            background: var(--primary-blue) !important;
-            border-color: var(--primary-blue) !important;
-            color: white !important;
-        }
-
-        /* Style tombol angka yang sedang aktif (halaman saat ini) */
-        .dt-paging-button.current {
-            background: var(--primary-blue) !important;
-            border-color: var(--primary-blue) !important;
-            color: white !important;
-            font-weight: bold !important;
-        }
-
-        /* Style untuk tombol yang sedang disable (mati) */
-        .dt-paging-button.disabled {
-            opacity: 0.4 !important;
-            cursor: not-allowed !important;
-        }
-
-        /* CSS Original Anda */
+        /* 
+        ============================================================
+        EFEK BACKGROUND BLUR (GLOW ORBS)
+        ============================================================
+        Menciptakan efek lingkaran blur di latar belakang untuk estetika.
+        ============================================================
+        */
         body::before {
-            content: ""; position: fixed; width: 500px; height: 500px;
-            background: var(--primary-blue); filter: blur(180px);
-            border-radius: 50%; top: -10%; left: -100px; z-index: -1; opacity: 0.15;
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--primary-blue);
+            filter: blur(180px);
+            border-radius: 50%;
+            top: -10%;
+            left: -100px;
+            z-index: -1;
+            opacity: 0.2;
         }
+
         body::after {
-            content: ""; position: fixed; width: 400px; height: 400px;
-            background: var(--accent-purple); filter: blur(180px);
-            border-radius: 50%; bottom: -10%; right: -100px; z-index: -1; opacity: 0.1;
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            filter: blur(180px);
+            border-radius: 50%;
+            bottom: -10%;
+            right: -100px;
+            z-index: -1;
+            opacity: 0.15;
         }
 
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            position: fixed;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-glass);
-            padding: 2rem 1.2rem;
-            z-index: 1000;
-        }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 2.5rem;
-            min-height: 100vh;
-        }
-
-        .nav-link {
-            color: #94a3b8;
-            padding: 12px 18px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            transition: 0.3s;
-            border: none;
-            width: 100%;
-            background: transparent;
-            text-align: left;
-        }
-
-        .nav-link i { font-size: 1.3rem; margin-right: 12px; }
-        .nav-link:hover, .nav-link.active {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--primary-blue);
-        }
-        .nav-link.active {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
-            border-left: 4px solid var(--primary-blue);
-            font-weight: 700;
-        }
-
-        .glass-card {
-            background: var(--card-glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 1.8rem;
-            height: 100%;
-        }
-
+        /* Gradien teks untuk efek warna-warni */
         .text-gradient {
             background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .custom-table { border-spacing: 0 10px; border-collapse: separate; width: 100% !important;}
+        /* 
+        ============================================================
+        KOMPONEN CARD DENGAN EFEK KACA (GLASSMORPHISM)
+        ============================================================
+        Digunakan untuk sidebar profil dan konten utama.
+        ============================================================
+        */
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        /* 
+        ============================================================
+        KONTAINER SCROLL UNTUK TABEL (AGAR TIDAK OVERFLOW)
+        ============================================================
+        Membatasi tinggi tabel dan menambahkan scroll vertikal.
+        ============================================================
+        */
+        .table-scroll-container {
+            max-height: 500px; 
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-top: 10px;
+        }
+
+        /* Custom Scrollbar */
+        .table-scroll-container::-webkit-scrollbar { width: 5px; }
+        .table-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .table-scroll-container::-webkit-scrollbar-thumb { 
+            background: rgba(59, 130, 246, 0.5); 
+            border-radius: 10px; 
+        }
+
+        /* 
+        ============================================================
+        STICKY HEADER TABEL
+        ============================================================
+        Header tabel tetap terlihat saat di-scroll.
+        ============================================================
+        */
+        .custom-table thead th {
+            position: sticky;
+            top: -1px;
+            background: #0b1425;
+            z-index: 20;
+            border-bottom: 1px solid var(--border-glass);
+            padding: 15px !important;
+            color: rgba(255,255,255,0.6) !important;
+        }
+
+        /* Kotak feedback/tanggapan admin */
+        .feedback-box {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 3px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        /* Thumbnail gambar di tabel */
+        .img-thumbnail-custom {
+            width: 100px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            transition: 0.3s;
+        }
+
+        .img-thumbnail-custom:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-blue);
+        }
+
+        /* 
+        ============================================================
+        KOMPONEN PROFIL SISWA (FOTO & INFO)
+        ============================================================
+        */
+        .profile-img-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-img {
+            width: 110px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid rgba(59, 130, 246, 0.5);
+            padding: 4px;
+        }
+
+        .btn-edit-photo {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--primary-blue);
+            color: white;
+            border: 3px solid var(--bg-color);
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        /* Kartu statistik mini (Total, Menunggu, Proses, Selesai) */
+        .stat-mini-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            padding: 15px;
+            border: 1px solid var(--border-glass);
+            text-align: center;
+        }
+
+        /* 
+        ============================================================
+        TOMBOL CUSTOM
+        ============================================================
+        */
+        .btn-primary-custom {
+            background: #3b82f6;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            background: #2563eb;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+
+        /* 
+        ============================================================
+        FORM CONTROL & INPUT (TEMA GELAP)
+        ============================================================
+        */
+        .form-control, .form-select {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: #ffffff !important;
+            border-radius: 12px;
+            padding: 12px 15px;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+            opacity: 1;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+            color: #ffffff;
+        }
+
+        .form-select option {
+            background-color: var(--dropdown-bg);
+            color: #ffffff;
+        }
+
+        /* 
+        ============================================================
+        TABEL CUSTOM DENGAN ROW SPACING
+        ============================================================
+        */
+        .custom-table { border-spacing: 0 12px; border-collapse: separate; }
         .custom-table tbody tr { background: rgba(255, 255, 255, 0.02); transition: 0.3s; }
-        .custom-table tbody tr:hover { background: rgba(255, 255, 255, 0.05); transform: translateY(-2px); }
+        .custom-table tbody tr:hover { background: rgba(255, 255, 255, 0.05); }
         .custom-table td { 
             padding: 1.2rem; border: none; vertical-align: middle; 
             border-top: 1px solid var(--border-glass);
@@ -150,498 +282,512 @@
         .custom-table td:first-child { border-left: 1px solid var(--border-glass); border-radius: 16px 0 0 16px; }
         .custom-table td:last-child { border-right: 1px solid var(--border-glass); border-radius: 0 16px 16px 0; }
 
-        .badge-modern {
-            padding: 6px 14px; border-radius: 100px; font-size: 0.7rem;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        /* 
+        ============================================================
+        BADGE STATUS (MENUNGGU, PROSES, SELESAI)
+        ============================================================
+        */
+        .badge-modern { 
+            padding: 6px 14px; border-radius: 100px; font-size: 0.75rem; 
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; 
         }
-        .st-waiting { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
-        .st-process { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
-        .st-done { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .st-selesai { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .st-proses { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .st-menunggu { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
 
-        .modal-content {
-            background: #0f172a; border-radius: 24px; border: 1px solid var(--border-glass); backdrop-filter: blur(20px);
-        }
-        .form-control, .form-select {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass);
-            color: white; border-radius: 12px; padding: 12px;
-        }
-        .form-select option { background: #0f172a; color: white; }
-        
-        .btn-primary-custom {
-            background: var(--primary-blue); border: none; border-radius: 12px;
-            padding: 10px 24px; font-weight: 600; transition: 0.3s; color: white;
-        }
-        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); color: white; }
-
-        .img-report { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; }
-
-        .log-container {
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-        .log-item {
-            position: relative; padding-left: 25px; padding-bottom: 1.5rem;
-            border-left: 2px solid rgba(59, 130, 246, 0.2);
-        }
-        .log-item::before {
-            content: ''; position: absolute; left: -7px; top: 5px;
-            width: 12px; height: 12px; background: var(--primary-blue);
-            border-radius: 50%; box-shadow: 0 0 10px var(--primary-blue);
+        /* 
+        ============================================================
+        MODAL & TIMELINE
+        ============================================================
+        */
+        .modal-content { 
+            background: #0f172a; border: 1px solid var(--border-glass); 
+            border-radius: 24px; backdrop-filter: blur(20px); 
         }
 
-        @media (max-width: 992px) {
-            .sidebar { width: 85px; padding: 2rem 0.5rem; }
-            .sidebar span, .sidebar h5 { display: none; }
-            .main-content { margin-left: 85px; }
+        .timeline-item { 
+            border-left: 2px solid rgba(59, 130, 246, 0.2); 
+            padding-left: 15px; padding-bottom: 15px; 
+            position: relative; 
+        }
+        .timeline-item::after { 
+            content: ''; position: absolute; left: -7px; top: 5px; 
+            width: 12px; height: 12px; background: var(--primary-blue); 
+            border-radius: 50%; box-shadow: 0 0 10px var(--primary-blue); 
         }
     </style>
 </head>
 <body>
 
-    <!-- ... (SIDEBAR DAN DASHBOARD TAB TETAP SAMA) ... -->
-    <div class="sidebar">
-        <div class="mb-5 px-3">
-            <h5 class="fw-800"><i class="bi bi-shield-lock-fill text-primary"></i> <span class="ms-2 text-white">AdminFix</span></h5>
-        </div>
-
-        <nav class="nav flex-column" id="v-pills-tab" role="tablist">
-            <button class="nav-link active" id="tab-dash" data-bs-toggle="pill" data-bs-target="#pills-dash" type="button" role="tab"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></button>
-            <button class="nav-link" id="tab-laporan" data-bs-toggle="pill" data-bs-target="#pills-laporan" type="button" role="tab"><i class="bi bi-megaphone-fill"></i><span>Pengaduan</span></button>
-            <button class="nav-link" id="tab-kategori" data-bs-toggle="pill" data-bs-target="#pills-kategori" type="button" role="tab"><i class="bi bi-tags-fill"></i><span>Kategori</span></button>
-            <button class="nav-link" id="tab-lokasi" data-bs-toggle="pill" data-bs-target="#pills-lokasi" type="button" role="tab"><i class="bi bi-geo-alt-fill"></i><span>Lokasi</span></button>
-            <button class="nav-link" id="tab-user" data-bs-toggle="pill" data-bs-target="#pills-user" type="button" role="tab"><i class="bi bi-people-fill"></i><span>Data Siswa</span></button>
+    <!-- 
+    ============================================================
+    KONTEN UTAMA (CONTAINER)
+    ============================================================
+    Layout terdiri dari 2 kolom:
+    - Kolom kiri (col-lg-4): Sidebar profil siswa & log aktivitas
+    - Kolom kanan (col-lg-8): Tabel riwayat laporan siswa
+    ============================================================
+    -->
+    <div class="container py-5">
+        <div class="row g-4">
             
-            <div class="mt-5 px-3 pt-4 border-top border-secondary border-opacity-25">
-                <a href="/logout" class="nav-link text-danger opacity-75"><i class="bi bi-power"></i><span>Logout</span></a>
-            </div>
-        </nav>
-    </div>
+            <!-- 
+            ============================================================
+            SIDEBAR KIRI: PROFIL SISWA & AKTIVITAS
+            ============================================================
+            Menampilkan:
+            - Foto profil (dengan tombol ganti foto)
+            - Nama, kelas, NIS
+            - Tombol buat laporan baru
+            - Timeline log aktivitas (riwayat aksi siswa)
+            - Tombol logout
+            ============================================================
+            -->
+            <div class="col-lg-4">
+                <div class="glass-card text-center h-100">
+                    <!-- Foto Profil -->
+                    <div class="profile-img-wrapper mb-3">
+                        @if($siswa->foto_profile)
+                            <img src="{{ asset('storage/' . $siswa->foto_profile) }}" class="profile-img">
+                        @else
+                            <!-- Fallback: Menggunakan UI Avatars jika tidak ada foto -->
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($siswa->nama) }}&background=3b82f6&color=fff&size=128" class="profile-img">
+                        @endif
+                        <button class="btn-edit-photo" data-bs-toggle="modal" data-bs-target="#modalProfile">
+                            <i class="bi bi-camera-fill"></i>
+                        </button>
+                    </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <!-- ... (Header Panel Administrator tetap sama) ... -->
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <div>
-                <h2 class="fw-800 mb-1">Panel <span class="text-gradient">Administrator</span></h2>
-                <p class="text-white opacity-75 small">Kelola laporan dan fasilitas sekolah secara efisien.</p>
-            </div>
-            <div class="d-flex align-items-center gap-3 glass-card py-2 px-3">
-                <div class="text-end">
-                    <p class="small fw-800 mb-0 text-white">{{ date('d M Y') }}</p>
-                    <p class="small text-white-50 mb-0">System Admin</p>
-                </div>
-                <div class="bg-primary bg-opacity-10 rounded-3 p-2 border border-primary border-opacity-25">
-                    <i class="bi bi-person-badge-fill text-primary fs-4"></i>
-                </div>
-            </div>
-        </div>
+                    <!-- Informasi Siswa -->
+                    <h4 class="fw-800 mb-1">{{ $siswa->nama }}</h4>
+                    <p class="text-white small mb-4 opacity-75">{{ $siswa->kelas }} • {{ $siswa->nis }}</p>
+                    
+                    <!-- Tombol Buat Laporan Baru -->
+                    <div class="d-grid mb-4">
+                        <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalLapor">
+                            <i class="bi bi-megaphone-fill me-2"></i>Buat Laporan Baru
+                        </button>
+                    </div>
 
-        <div class="tab-content" id="v-pills-tabContent">
-            
-            <!-- TAB 1: DASHBOARD (Tabel Riwayat Tetap Biasa) -->
-            <div class="tab-pane fade show active" id="pills-dash" role="tabpanel">
-                <!-- ... (Isi Dash tetap sama) ... -->
-                <div class="row g-3 mb-5"> 
-                    <div class="col-md-3 col-6">
-                        <div class="glass-card text-center">
-                            <p class="text-white-50 small mb-1">TOTAL LAPORAN</p>
-                            <h2 class="fw-800 mb-0 text-white">{{ count($laporan) }}</h2>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="glass-card text-center" style="border-bottom: 3px solid #fbbf24;">
-                            <p class="text-warning small mb-1">MENUNGGU</p>
-                            <h2 class="fw-800 mb-0 text-warning">{{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? 'Menunggu') == 'Menunggu')->count() }}</h2>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="glass-card text-center" style="border-bottom: 3px solid #3b82f6;">
-                            <p class="text-primary small mb-1">PROSES</p>
-                            <h2 class="fw-800 mb-0 text-primary">{{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? '') == 'Proses')->count() }}</h2>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="glass-card text-center" style="border-bottom: 3px solid #4ade80;">
-                            <p class="text-success small mb-1">SELESAI</p>
-                            <h2 class="fw-800 mb-0 text-success">{{ $laporan->filter(fn($i) => ($i->aspirasi->status ?? '') == 'Selesai')->count() }}</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <div class="glass-card">
-                            <h6 class="fw-800 mb-4 text-white">Aktivitas Pelaporan Terkini</h6>
-                            <div class="table-responsive">
-                                <table class="table text-black custom-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Siswa</th>
-                                            <th>Laporan</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($laporan->take(5) as $l)
-                                        <tr>
-                                            <td class="fw-700">{{ $l->siswa->nama }}</td>
-                                            <td class="text-black-50 small">{{ Str::limit($l->ket, 35) }}</td>
-                                            <td>
-                                                @php $st = $l->aspirasi->status ?? 'Menunggu'; @endphp
-                                                <span class="badge-modern {{ $st == 'Selesai' ? 'st-done' : ($st == 'Proses' ? 'st-process' : 'st-waiting') }}">
-                                                    {{ $st }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="glass-card">
-                            <h6 class="fw-800 mb-4 text-white">Log Sistem</h6>
-                            <div class="log-container">
-                                @forelse($logs as $log)
-                                <div class="log-item">
-                                    <p class="small fw-700 mb-0 text-info">{{ $log->username ?? $log->nis }}</p>
-                                    <p class="small text-white-50 mb-0">{{ $log->aktivitas }}</p>
-                                    <small class="opacity-50 text-white" style="font-size: 0.65rem;">
-                                        {{ $log->created_at->diffForHumans() }}
-                                    </small>
+                    <!-- Riwayat Aktivitas (Log) -->
+                    <div class="text-start border-top border-secondary border-opacity-10 pt-4">
+                        <h6 class="fw-700 mb-3 small text-primary text-uppercase" style="letter-spacing: 1px;">Riwayat Aktivitas</h6>
+                        <div class="log-container overflow-auto" style="max-height: 200px;">
+                            @forelse($logs as $log)
+                                <div class="timeline-item">
+                                    <div class="text-white small fw-600">{{ $log->aktivitas }}</div>
+                                    <div class="text-white-50" style="font-size: 0.7rem;">{{ $log->created_at->diffForHumans() }}</div>
                                 </div>
-                                @empty
-                                <p class="text-white-50 small">Tidak ada log.</p>
-                                @endforelse
-                            </div>
+                            @empty
+                                <p class="small text-white-50">Belum ada aktivitas.</p>
+                            @endforelse
                         </div>
+                    </div>
+
+                    <!-- Tombol Logout -->
+                    <div class="mt-4 pt-3">
+                        <a href="/logout" class="text-danger text-decoration-none small fw-bold opacity-75">
+                            <i class="bi bi-box-arrow-right me-1"></i> Logout
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: LAPORAN (INI YANG DIUBAH PAKAI DATATABLES) -->
-            <div class="tab-pane fade" id="pills-laporan" role="tabpanel">
+            <!-- 
+            ============================================================
+            KOLOM KANAN: KONTEN UTAMA
+            ============================================================
+            -->
+            <div class="col-lg-8">
+                <!-- Header Selamat Datang & Kartu Statistik -->
+                <div class="row g-3 mb-4 align-items-center">
+                    <div class="col-md-5">
+                        <h2 class="fw-800 mb-1">Selamat Datang, <span class="text-gradient">{{ explode(' ', $siswa->nama)[0] }}!</span></h2>
+                        <p class="text-white-50 small mb-0">Pantau status perbaikan fasilitas sekolahmu.</p>
+                    </div>
+                    <div class="col-md-7">
+                        <!-- 4 Kartu Statistik: Total, Menunggu, Proses, Selesai -->
+                        <div class="row g-2">
+                            <div class="col-3">
+                                <div class="stat-mini-card">
+                                    <div class="text-white-50 mb-1" style="font-size: 0.65rem;">TOTAL</div>
+                                    <div class="h5 fw-800 mb-0">{{ count($pengaduan) }}</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="stat-mini-card">
+                                    <div class="text-warning mb-1" style="font-size: 0.65rem;">MENUNGGU</div>
+                                    <div class="h5 fw-800 mb-0 text-warning">
+                                        {{ $pengaduan->filter(function($p) {
+                                            return ($p->aspirasi->status ?? 'Menunggu') == 'Menunggu';
+                                        })->count() }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="stat-mini-card">
+                                    <div class="text-primary mb-1" style="font-size: 0.65rem;">PROSES</div>
+                                    <div class="h5 fw-800 mb-0 text-primary">{{ $pengaduan->where('aspirasi.status', 'Proses')->count() }}</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="stat-mini-card">
+                                    <div class="text-success mb-1" style="font-size: 0.65rem;">SELESAI</div>
+                                    <div class="h5 fw-800 mb-0 text-success">{{ $pengaduan->where('aspirasi.status', 'Selesai')->count() }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 
+                ============================================================
+                TABEL RIWAYAT LAPORAN SISWA
+                ============================================================
+                Menampilkan semua pengaduan yang pernah dibuat oleh siswa.
+                Fitur:
+                - Scroll vertikal jika data banyak
+                - Tombol Edit & Batal hanya muncul jika status "Menunggu"
+                - Menampilkan feedback dan bukti perbaikan dari admin jika sudah ada
+                ============================================================
+                -->
                 <div class="glass-card">
-                    <div class="mb-4">
-                        <h5 class="fw-800 mb-0 text-white">Manajemen Pengaduan</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-800 mb-0">Laporan Saya</h5>
+                            <p class="text-white-50 small mb-0">Riwayat pengaduan fasilitas sekolah Anda</p>
+                        </div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 small" style="font-size: 0.7rem; border: 1px solid rgba(59,130,246,0.2)">
+                            <i class="bi bi-arrow-repeat me-1"></i> Auto Refresh
+                        </span>
                     </div>
                     
-                    <div class="table-responsive">
-                        <!-- TAMBAHKAN ID tableLaporan DI SINI -->
-                        <table id="tableLaporan" class="table custom-table">
-                            <thead>
-                                <tr class="text-white-50 small" style="text-transform: uppercase; letter-spacing: 1px;">
-                                    <th>Bukti</th>
-                                    <th>Pelapor & Kategori</th>
-                                    <th>Detail & Lokasi</th>
-                                    <th>Status</th>
-                                    <th class="text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($laporan as $l)
-                                <tr>
-                                    <td style="width: 80px;">
-                                        <img src="{{ asset('storage/'.$l->foto) }}" class="img-report shadow-sm border border-white border-opacity-10">
-                                    </td>
-                                    <td>
-                                        <div class="fw-700 text-black mb-1">
-                                            <i class="bi bi-person-circle me-1 text-primary-emphasis"></i> {{ $l->siswa->nama }}
-                                        </div>
-                                        <div class="badge bg-white bg-opacity-10 text-black-50 fw-normal" style="font-size: 0.65rem;">
-                                            <i class="bi bi-tag-fill me-1"></i> {{ $l->kategori->ket_kategori ?? 'Umum' }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-black small fw-600 mb-1">
-                                            <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $l->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak ada' }}
-                                        </div>
-                                        <p class="text-black-50 small mb-0" style="max-width: 250px; line-height: 1.4;">
-                                            {{ $l->ket }}
-                                        </p>
-                                    </td>
-                                    <td>
-                                        @php $st = $l->aspirasi->status ?? 'Menunggu'; @endphp
-                                        <div class="d-flex flex-column align-items-start">
-                                            <span class="badge-modern {{ $st == 'Selesai' ? 'st-done' : ($st == 'Proses' ? 'st-process' : 'st-waiting') }}">
-                                                {{ $st }}
-                                            </span>
-                                            <small class="text-black-50 mt-1" style="font-size: 0.6rem;">
-                                                <i class="bi bi-calendar3 me-1"></i> {{ $l->created_at->format('d/m/y') }}
-                                            </small>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-primary-custom btn-sm px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTanggapi{{ $l->id_pelaporan }}">
-                                            <i class="bi bi-gear-fill me-1"></i> Kelola
-                                        </button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <!-- Container dengan scroll untuk tabel -->
+                    <div class="table-scroll-container">
+                        <div class="table-responsive">
+                            <table class="table custom-table text-white mb-0">
+                                <thead>
+                                    <tr class="text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">
+                                        <th class="border-0">Laporan</th>
+                                        <th class="border-0">Detail & Tanggapan</th>
+                                        <th class="border-0 text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($pengaduan as $p)
+                                    @php
+                                        $status = $p->aspirasi->status ?? 'Menunggu';
+                                        $badgeClass = ($status == 'Selesai') ? 'st-selesai' : (($status == 'Proses') ? 'st-proses' : 'st-menunggu');
+                                    @endphp
+                                    <tr>
+                                        <!-- Kolom 1: Bukti Kerusakan & Tanggal -->
+                                        <td style="width: 140px;">
+                                            <div class="position-relative">
+                                                <label class="d-block text-black-50 fw-bold mb-2" style="font-size: 0.6rem; text-transform: uppercase;">Bukti Kerusakan</label>
+                                                <a href="{{ asset('storage/'.$p->foto) }}" target="_blank">
+                                                    <img src="{{ asset('storage/'.$p->foto) }}" class="img-thumbnail-custom shadow-sm">
+                                                </a>
+                                                <div class="mt-2 text-black-50" style="font-size: 0.65rem;">
+                                                    <i class="bi bi-calendar3 me-1"></i> {{ $p->created_at->format('d M Y') }}
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- Kolom 2: Detail Laporan & Tanggapan Admin -->
+                                        <td>
+                                            <!-- Lokasi dan deskripsi kerusakan -->
+                                            <div class="mb-1">
+                                                <span class="badge bg-balck bg-opacity-10 text-black-50 fw-normal mb-2" style="font-size: 0.65rem;">
+                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $p->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak diketahui' }}
+                                                </span>
+                                                <p class="text-black opacity-75 small mb-0" style="line-height: 1.5; max-width: 400px;">
+                                                    {{ $p->ket }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Feedback dari Admin (jika ada) -->
+                                            @if($p->aspirasi)
+                                            <div class="feedback-box">
+                                                <div class="d-flex align-items-start gap-2 mb-2">
+                                                    <i class="bi bi-chat-square-text-fill text-primary"></i>
+                                                    <div>
+                                                        <label class="d-block text-primary fw-bold" style="font-size: 0.7rem; text-transform: uppercase;">Respon Administrator</label>
+                                                        <p class="text-black-50 small mb-0">{{ $p->aspirasi->feedback ?? 'Sedang ditinjau...' }}</p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Bukti Hasil Perbaikan (jika ada) -->
+                                                @if($p->aspirasi->foto)
+                                                <div class="mt-3 pt-2 border-top border-white border-opacity-10">
+                                                    <label class="d-block text-success fw-bold mb-2" style="font-size: 0.65rem; text-transform: uppercase;">
+                                                        <i class="bi bi-check-all me-1"></i> Bukti Hasil Perbaikan
+                                                    </label>
+                                                    <a href="{{ asset('storage/'.$p->aspirasi->foto) }}" target="_blank">
+                                                        <img src="{{ asset('storage/'.$p->aspirasi->foto) }}" class="img-thumbnail-custom" style="width: 80px; height: 60px;">
+                                                    </a>
+                                                </div>
+                                                @endif
+                                            </div>
+                                            @endif
+
+                                            <!-- Tombol Aksi (Edit & Batal) - Hanya muncul jika status Menunggu -->
+                                            @if($status == 'Menunggu')
+                                            <div class="mt-3 d-flex gap-2">
+                                                <button class="btn btn-sm btn-outline-info py-1 px-3 rounded-pill" style="font-size: 0.65rem;"
+                                                        onclick="editLaporan('{{ $p->id_pelaporan }}', '{{ $p->id_kategori }}', '{{ $p->id_lokasi }}', '{{ $p->ket }}')">
+                                                    <i class="bi bi-pencil me-1"></i> Edit
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill" style="font-size: 0.65rem;"
+                                                        onclick="confirmDelete('{{ $p->id_pelaporan }}')">
+                                                    <i class="bi bi-x-lg me-1"></i> Batal
+                                                </button>
+                                            </div>
+                                            @endif
+                                        </td>
+
+                                        <!-- Kolom 3: Status Laporan -->
+                                        <td class="text-end">
+                                            <span class="badge-modern {{ $badgeClass }}">{{ $status }}</span>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <!-- Jika tidak ada laporan -->
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5">
+                                            <i class="bi bi-clipboard-x fs-1 text-white-50 d-block mb-3"></i>
+                                            <p class="text-black-50 small">Belum ada laporan yang diajukan.</p>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- TAB 3, 4, 5 (TETAP SAMA SEPERTI ASLINYA, TIDAK PAKAI DATATABLES) -->
-            <div class="tab-pane fade" id="pills-kategori" role="tabpanel">
-                <!-- ... (Isi Kategori tetap sama) ... -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-800 text-white">Kategori Fasilitas</h5>
-                    <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalAddKategori"><i class="bi bi-plus-lg me-2"></i>Kategori Baru</button>
-                </div>
-                <div class="glass-card">
-                    <table class="table text-white custom-table">
-                        <thead><tr><th>ID</th><th>Nama Kategori</th><th class="text-end">Opsi</th></tr></thead>
-                        <tbody>
-                            @foreach($kategori as $k)
-                            <tr>
-                                <td class="text-primary fw-800">#{{ $k->id_kategori }}</td>
-                                <td>{{ $k->ket_kategori }}</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-info border-0" data-bs-toggle="modal" data-bs-target="#modalEditKategori{{ $k->id_kategori }}"><i class="bi bi-pencil-fill"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger border-0" onclick="confirmDelete('/admin/kategori/hapus/{{ $k->id_kategori }}', 'Hapus kategori ini?')"><i class="bi bi-trash-fill"></i></button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="pills-lokasi" role="tabpanel">
-                <!-- ... (Isi Lokasi tetap sama) ... -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-800 text-white">Daftar Lokasi Fasilitas</h5>
-                    <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalAddLokasi">
-                        <i class="bi bi-plus-lg me-2"></i>Lokasi Baru
-                    </button>
-                </div>
-                <div class="glass-card">
-                    <table class="table text-white custom-table">
-                        <thead><tr><th>ID</th><th>Nama Lokasi</th><th class="text-end">Opsi</th></tr></thead>
-                        <tbody>
-                            @foreach($lokasi as $l)
-                            <tr>
-                                <td class="text-primary fw-800">#{{ $l->id_lokasi }}</td>
-                                <td>{{ $l->nama_lokasi }}</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-info border-0" data-bs-toggle="modal" data-bs-target="#modalEditLokasi{{ $l->id_lokasi }}"><i class="bi bi-pencil-fill"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger border-0" onclick="confirmDelete('/admin/lokasi/hapus/{{ $l->id_lokasi }}', 'Hapus lokasi ini?')"><i class="bi bi-trash-fill"></i></button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="pills-user" role="tabpanel">
-                <!-- ... (Isi Siswa tetap sama) ... -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-800 text-white">Data Master Siswa</h5>
-                    <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalAddSiswa"><i class="bi bi-person-plus-fill me-2"></i>Tambah Siswa</button>
-                </div>
-                <div class="glass-card">
-                    <table class="table text-white custom-table">
-                        <thead><tr><th>NIS</th><th>Nama Lengkap</th><th class="text-end">Opsi</th></tr></thead>
-                        <tbody>
-                            @foreach($siswa as $s)
-                            <tr><td>{{ $s->nis }}</td><td>{{ $s->nama }}</td><td class="text-end"><button class="btn btn-sm btn-outline-danger border-0" onclick="confirmDelete('/admin/siswa/hapus/{{ $s->nis }}', 'Hapus siswa?')"><i class="bi bi-person-x-fill fs-5"></i></button></td></tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ... (SEMUA MODAL TETAP SAMA) ... -->
-    <!-- MODAL ADD LOKASI -->
-        <div class="modal fade" id="modalAddLokasi" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <form action="/admin/lokasi" method="POST" class="modal-content p-3">
+    <!-- 
+    ============================================================
+    MODAL-MODAL
+    ============================================================
+    - modalProfile: Ganti foto profil siswa
+    - modalLapor: Form untuk membuat laporan baru
+    - modalEdit: Form untuk mengedit laporan yang masih menunggu
+    - formDelete: Form tersembunyi untuk menghapus laporan
+    ============================================================
+    -->
+
+    <!-- MODAL GANTI FOTO PROFIL -->
+    <div class="modal fade" id="modalProfile" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="modal-title fw-800 text-white">Ganti Foto Profil</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url('/siswa/update-foto') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-header border-0 pb-0">
-                        <h6 class="fw-800 text-white">Tambah Lokasi Baru</h6>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" name="nama_lokasi" class="form-control" placeholder="Nama Lokasi (Contoh: Gedung A)" required>
+                    <div class="modal-body text-center">
+                        <input type="file" name="foto_profile" class="form-control" accept="image/*" required>
                     </div>
                     <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary-custom w-100">Simpan Lokasi</button>
+                        <button type="submit" class="btn btn-primary-custom w-100">Simpan Foto</button>
                     </div>
                 </form>
             </div>
         </div>
+    </div>
 
-        <!-- MODAL EDIT LOKASI -->
-        @foreach($lokasi as $l)
-        <div class="modal fade" id="modalEditLokasi{{ $l->id_lokasi }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <form action="/admin/lokasi/update" method="POST" class="modal-content p-3">
-                    @csrf
-                    <input type="hidden" name="id_lokasi" value="{{ $l->id_lokasi }}">
-                    <div class="modal-header border-0 pb-0">
-                        <h6 class="fw-800 text-white">Edit Nama Lokasi</h6>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" name="nama_lokasi" class="form-control" value="{{ $l->nama_lokasi }}" required>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary-custom w-100">Simpan Perubahan</button>
-                    </div>
-                </form>
+    <!-- TAMPILAN PESAN ERROR (Jika ada validasi yang gagal) -->
+    <div class="container mt-3">
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 15px; background: rgba(220, 53, 69, 0.2); color: white; border: 1px solid rgba(220, 53, 69, 0.4); backdrop-filter: blur(10px);">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li><i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        </div>
-        @endforeach
-
-        <!-- MODAL ADD KATEGORI -->
-        <div class="modal fade" id="modalAddKategori" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <form action="/admin/kategori" method="POST" class="modal-content p-3">
-                    @csrf
-                    <div class="modal-header border-0 pb-0">
-                        <h6 class="fw-800 text-white">Tambah Kategori Baru</h6>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" name="ket_kategori" class="form-control" placeholder="Nama Kategori..." required>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary-custom w-100">Simpan</button>
-                    </div>
-                </form>
+        @endif
+        
+        @if(session('error'))
+            <div class="alert alert-danger" style="border-radius: 15px;">
+                {{ session('error') }}
             </div>
-        </div>
+        @endif
+    </div>
 
-        <!-- MODAL EDIT KATEGORI -->
-        @foreach($kategori as $k)
-        <div class="modal fade" id="modalEditKategori{{ $k->id_kategori }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <form action="/admin/kategori/update" method="POST" class="modal-content p-3">
+    <!-- MODAL BUAT LAPORAN BARU -->
+    <div class="modal fade" id="modalLapor" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-800"><span class="text-gradient">Buat Laporan Baru</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url('/siswa/lapor') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" name="id_kategori" value="{{ $k->id_kategori }}">
-                    <div class="modal-header border-0 pb-0">
-                        <h6 class="fw-800 text-white">Edit Kategori</h6>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" name="ket_kategori" class="form-control" value="{{ $k->ket_kategori }}" required>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary-custom w-100">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        @endforeach
-
-        <!-- MODAL ASPIRASI -->
-        @foreach($laporan as $l)
-        <div class="modal fade" id="modalTanggapi{{ $l->id_pelaporan }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <form action="/admin/tanggapi" method="POST" enctype="multipart/form-data" class="modal-content">
-                    @csrf
-                  <input type="hidden" name="id_pelaporan" value="{{ $l->id_pelaporan }}">
                     <div class="modal-body p-4">
-                        <div class="row g-4">
-                            <div class="col-md-5">
-                                <label class="small text-white-50 mb-2">Foto Laporan Siswa:</label>
-                                <img src="{{ asset('storage/'.$l->foto) }}" class="img-fluid rounded-4 shadow border border-white border-opacity-10 mb-3">
-                                @if(isset($l->aspirasi->foto))
-                                <label class="small text-success mb-2">Foto Bukti Perbaikan:</label>
-                                <img src="{{ asset('storage/'.$l->aspirasi->foto) }}" class="img-fluid rounded-4 border border-success border-opacity-50">
-                                @endif
+                        <div class="row g-3">
+                            <!-- Pilih Kategori -->
+                            <div class="col-md-6">
+                                <label class="small text-white mb-2 fw-600">Kategori Fasilitas</label>
+                                <select name="id_kategori" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Kategori</option>
+                                    @foreach($kategori as $k)
+                                        <option value="{{ $k->id_kategori }}">{{ $k->ket_kategori }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="col-md-7">
-                                <h5 class="fw-800 text-white mb-3">Kelola Laporan</h5>
-                                <div class="mb-3">
-                                    <label class="small text-white-50 mb-2">Update Status</label>
-                                    <select name="status" class="form-select">
-                                        <option value="Menunggu" {{ ($l->aspirasi->status ?? '') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                                        <option value="Proses" {{ ($l->aspirasi->status ?? '') == 'Proses' ? 'selected' : '' }}>Proses</option>
-                                        <option value="Selesai" {{ ($l->aspirasi->status ?? '') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="small text-white-50 mb-2">Unggah Bukti Perbaikan</label>
-                                    <input type="file" name="foto_bukti" class="form-control" accept="image/*">
-                                </div>
-                                <div class="mb-4">
-                                    <label class="small text-white-50 mb-2">Tanggapan Admin</label>
-                                    <textarea name="feedback" class="form-control" rows="4" required>{{ $l->aspirasi->feedback ?? '' }}</textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary-custom w-100">Simpan Tanggapan</button>
+                            <!-- Pilih Lokasi -->
+                            <div class="col-md-6">
+                                <label class="small text-white mb-2 fw-600">Lokasi Spesifik</label>
+                                <select name="id_lokasi" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Lokasi</option>
+                                    @foreach($lokasi as $l)
+                                        <option value="{{ $l->id_lokasi }}">{{ $l->nama_lokasi }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <!-- Deskripsi Kerusakan -->
+                            <div class="col-12">
+                                <label class="small text-white mb-2 fw-600">Deskripsi Kerusakan</label>
+                                <textarea name="ket" class="form-control" rows="4" placeholder="Jelaskan detail kerusakan..." required></textarea>
+                            </div>
+                            <!-- Upload Foto Bukti -->
+                            <div class="col-12">
+                                <label class="small text-white mb-2 fw-600">Unggah Foto Bukti</label>
+                                <input type="file" name="foto_kerusakan" class="form-control" required>
+                                <small class="text-white-50" style="font-size: 0.7rem;">
+                                    <i class="bi bi-info-circle me-1"></i> Maksimal ukuran foto: 2MB (Jika lebih, laporan tidak akan terkirim).
+                                </small>
                             </div>
                         </div>
                     </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3">Kirim Pengaduan Sekarang</button>
+                    </div>
                 </form>
             </div>
         </div>
-        @endforeach
+    </div>
 
-        <!-- MODAL ADD SISWA -->
-        <div class="modal fade" id="modalAddSiswa" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <form action="/admin/siswa" method="POST" class="modal-content p-3">
+    <!-- MODAL EDIT LAPORAN (Hanya untuk status Menunggu) -->
+    <div class="modal fade" id="modalEdit" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-800"><span class="text-gradient">Edit Laporan</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formEdit" action="" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-header border-0 pb-0">
-                        <h6 class="fw-800 text-white">Daftarkan Siswa</h6>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3"><input type="number" name="nis" class="form-control" placeholder="NIS" required></div>
-                        <div class="mb-3"><input type="text" name="nama" class="form-control" placeholder="Nama Lengkap" required></div>
-                        <div class="mb-3"><input type="text" name="kelas" class="form-control" placeholder="Kelas" required></div>
-                        <div class="mb-3"><input type="password" name="password" class="form-control" placeholder="Password" required></div>
+                    @method('PUT')
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <!-- Edit Kategori -->
+                            <div class="col-md-6">
+                                <label class="small text-white mb-2 fw-600">Kategori Fasilitas</label>
+                                <select name="id_kategori" id="edit_kategori" class="form-select" required>
+                                    @foreach($kategori as $k)
+                                        <option value="{{ $k->id_kategori }}">{{ $k->ket_kategori }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <!-- Edit Lokasi -->
+                            <div class="col-md-6">
+                                <label class="small text-white mb-2 fw-600">Lokasi Spesifik</label>
+                                <select name="id_lokasi" id="edit_lokasi" class="form-select" required>
+                                    @foreach($lokasi as $l)
+                                        <option value="{{ $l->id_lokasi }}">{{ $l->nama_lokasi }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <!-- Edit Deskripsi -->
+                            <div class="col-12">
+                                <label class="small text-white mb-2 fw-600">Deskripsi Kerusakan</label>
+                                <textarea name="ket" id="edit_ket" class="form-control" rows="4" required></textarea>
+                            </div>
+                            <!-- Ganti Foto (Opsional) -->
+                            <div class="col-12">
+                                <label class="small text-white mb-2 fw-600">Ganti Foto (Opsional)</label>
+                                <input type="file" name="foto_kerusakan" class="form-control">
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary-custom w-100">Simpan Akun</button>
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
         </div>
+    </div>
 
-    <!-- 3. TAMBAHKAN JQUERY DAN JS DATATABLES DI BAWAH -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- FORM DELETE TERSEMBUNYI (Untuk menghapus laporan) -->
+    <form id="formDelete" action="" method="POST" style="display:none;">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <!-- 
+    ============================================================
+    JAVASCRIPT & DEPENDENSI
+    ============================================================
+    - Bootstrap Bundle (termasuk Popper)
+    - SweetAlert2 untuk notifikasi popup
+    - Fungsi-fungsi: editLaporan(), confirmDelete()
+    - Menampilkan alert sukses dari session Laravel
+    ============================================================
+    -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="//cdn.datatables.net/2.3.7/js/dataTables.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(document).ready(function() {
-        $('#tableLaporan').DataTable({
-            "pagingType": "full_numbers",
-            "language": {
-                // GANTI BAGIAN URL DENGAN TEKS LANGSUNG SEPERTI INI:
-                "sEmptyTable":   "Tidak ada data yang tersedia pada tabel ini",
-                "sProcessing":   "Sedang memproses...",
-                "sLengthMenu":   "Tampilkan _MENU_ data",
-                "sZeroRecords":  "Tidak ditemukan data yang sesuai",
-                "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
-                "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
-                "sSearch":       "Cari Laporan:",
-                "paginate": {
-                    "first":    "««",
-                    "previous": "‹",
-                    "next":     "›",
-                    "last":     "»»"
-                }
-            },
-            "pageLength": 10,
-            "order": [[3, 'desc']],
-            "columnDefs": [
-                { "orderable": false, "targets": [0, 4] }
-            ]
-        });
-    });
+        /**
+         * FUNGSI: Menampilkan notifikasi sukses dari session Laravel
+         * Digunakan untuk memberi feedback setelah create/update/delete
+         */
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                background: '#0f172a',
+                color: '#ffffff',
+                confirmButtonColor: '#3b82f6'
+            });
+        @endif
 
+        $(document).ready(function() {
+            $('#tableLaporan').DataTable({
+                "pagingType": "full_numbers",
+                "lengthMenu": [10, 25, 50, 100], // Pilihan jumlah data
+                "language": {
+                    // Mengubah teks "Show [10] entries" menjadi lebih simpel
+                    "lengthMenu": "_MENU_ data per halaman", 
+                    "sSearch": "<i class='bi bi-search me-2'></i>", // Ganti teks cari jadi ikon saja agar bersih
+                    "searchPlaceholder": "Cari laporan...",
+                    "sEmptyTable": "Tidak ada data",
+                    "sInfo": "Menampilkan _START_ - _END_ dari _TOTAL_ laporan",
+                    "sInfoEmpty": "Menampilkan 0 laporan",
+                    "sInfoFiltered": "(disaring dari _MAX_ data)",
+                    "sZeroRecords": "Data tidak ditemukan",
+                    "paginate": {
+                        "first": "«",
+                        "previous": "‹",
+                        "next": "›",
+                        "last": "»"
+                    }
+                },
+                "pageLength": 10,
+                "order": [[3, 'desc']],
+                "columnDefs": [
+                    { "orderable": false, "targets": [0, 4] }
+                ]
+            });
+        });
     // Fungsi Konfirmasi Hapus
     function confirmDelete(url, message) {
         Swal.fire({

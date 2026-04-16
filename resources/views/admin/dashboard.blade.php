@@ -32,28 +32,42 @@
             overflow-x: hidden;
         }
 
-        /* 2. STYLE KHUSUS AGAR DATATABLES COCOK DENGAN TEMA GELAP ANDA */
-        .dt-container {
-            color: white !important;
-            padding: 10px 0;
+        /* Menata kontainer pagination agar rapi */
+        .dt-paging {
+            margin-top: 1.5rem !important;
+            text-align: right !important;
         }
-        .dt-search input {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid var(--border-glass) !important;
-            color: white !important;
-            border-radius: 10px !important;
-        }
-        .dt-length select {
-            background: #0f172a !important;
-            color: white !important;
-            border: 1px solid var(--border-glass) !important;
-        }
+
+        /* Style umum tombol pagination */
         .dt-paging-button {
+            background: rgba(255, 255, 255, 0.86) !important;
+            border: 1px solid var(--border-glass) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            margin: 0 3px !important;
+            padding: 5px 12px !important;
+            transition: 0.3s !important;
+        }
+
+        /* Style tombol saat hover */
+        .dt-paging-button:hover {
+            background: var(--primary-blue) !important;
+            border-color: var(--primary-blue) !important;
             color: white !important;
         }
-        .dt-info {
-            color: rgba(255,255,255,0.5) !important;
-            font-size: 0.8rem;
+
+        /* Style tombol angka yang sedang aktif (halaman saat ini) */
+        .dt-paging-button.current {
+            background: var(--primary-blue) !important;
+            border-color: var(--primary-blue) !important;
+            color: white !important;
+            font-weight: bold !important;
+        }
+
+        /* Style untuk tombol yang sedang disable (mati) */
+        .dt-paging-button.disabled {
+            opacity: 0.4 !important;
+            cursor: not-allowed !important;
         }
 
         /* CSS Original Anda */
@@ -534,7 +548,7 @@
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <form action="/admin/tanggapi" method="POST" enctype="multipart/form-data" class="modal-content">
                     @csrf
-                    <input type="hidden" name="id_pelaporan" value="{{ $l->id_pelaporan }}">
+                  <input type="hidden" name="id_pelaporan" value="{{ $l->id_pelaporan }}">
                     <div class="modal-body p-4">
                         <div class="row g-4">
                             <div class="col-md-5">
@@ -601,17 +615,24 @@
 
     <script>
         $(document).ready(function() {
-            // AKTIFKAN DATATABLES HANYA UNTUK TABEL PENGADUAN
             $('#tableLaporan').DataTable({
+                "pagingType": "full_numbers", // Mengaktifkan tombol First, Last, dan Numbers
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json", // Pakai Bahasa Indonesia
+                    "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json",
                     "search": "Cari Laporan:",
-                    "lengthMenu": "Tampilkan _MENU_ data"
+                    "lengthMenu": "Tampilkan _MENU_ data",
+                    // Custom label untuk tombol navigasi
+                    "paginate": {
+                        "first": "««",    // Simbol <<
+                        "previous": "‹",   // Simbol <
+                        "next": "›",       // Simbol >
+                        "last": "»»"      // Simbol >>
+                    }
                 },
                 "pageLength": 10,
-                "order": [[3, 'desc']], // Urutkan dari status/tanggal terbaru
+                "order": [[3, 'desc']],
                 "columnDefs": [
-                    { "orderable": false, "targets": [0, 4] } // Kolom Bukti & Aksi tidak bisa disortir
+                    { "orderable": false, "targets": [0, 4] }
                 ]
             });
         });

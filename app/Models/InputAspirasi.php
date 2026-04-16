@@ -40,6 +40,6 @@ class InputAspirasi extends Model
     public function aspirasi()
     {
         // Menghubungkan id_pelaporan dengan id_aspirasi di tabel aspirasi
-        return $this->hasOne(Aspirasi::class, 'id_aspirasi', 'id_pelaporan');
+        return $this->hasOne(Aspirasi::class, 'id_pelaporan', 'id_pelaporan');
     }
 }

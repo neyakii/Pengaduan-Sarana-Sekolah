@@ -35,17 +35,22 @@ class SiswaController extends Controller
     public function updateFoto(Request $request) 
     {
         $request->validate([
-            'foto_profile' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+            // Menaikkan max ke 10240 (10MB) untuk menghindari error palsu
+            'foto_profile' => 'required|image|mimes:jpeg,png,jpg|max:10240'
         ]);
 
         if ($request->hasFile('foto_profile')) {
+            $siswa = Siswa::where('nis', session('nis'))->first();
+            
+            // Hapus foto profil lama jika ada
+            if ($siswa->foto_profile) {
+                Storage::disk('public')->delete($siswa->foto_profile);
+            }
+
             $path = $request->file('foto_profile')->store('profile_siswa', 'public');
             
-            Siswa::where('nis', session('nis'))->update([
-                'foto_profile' => $path
-            ]);
+            $siswa->update(['foto_profile' => $path]);
 
-            // CATAT LOG
             LogAktivitas::create([
                 'nis' => session('nis'), 
                 'aktivitas' => 'Memperbarui foto profil baru'
@@ -60,16 +65,16 @@ class SiswaController extends Controller
     // 2. BUAT LAPORAN BARU
     public function storeLapor(Request $request) 
     {
-        // Tambahkan pesan custom agar kita tahu persis apa yang salah
         $request->validate([
             'id_kategori' => 'required', 
             'id_lokasi' => 'required', 
             'ket' => 'required', 
-            'foto_kerusakan' => 'required|image|mimes:jpeg,png,jpg|max:2048' // Maksimal 2MB
+            // Ubah max menjadi 10240 (10MB) untuk memastikan file kecil tidak tertolak
+            'foto_kerusakan' => 'required|image|mimes:jpeg,png,jpg|max:10240' 
         ], [
-            'foto_kerusakan.max' => 'Ukuran foto terlalu besar! Maksimal adalah 2MB.',
-            'foto_kerusakan.image' => 'File yang diunggah harus berupa gambar.',
-            'required' => 'Kolom :attribute tidak boleh kosong.'
+            'foto_kerusakan.max' => 'Ukuran file terbaca terlalu besar oleh sistem. Coba kompres foto Anda.',
+            'foto_kerusakan.image' => 'File harus berupa gambar (JPG/PNG).',
+            'required' => 'Kolom :attribute wajib diisi.'
         ]);
 
         try {
@@ -94,11 +99,10 @@ class SiswaController extends Controller
                 return back()->with('success', 'Laporan berhasil dikirim!');
             }
             
-            return back()->with('error', 'File foto tidak terdeteksi.');
+            return back()->with('error', 'File foto tidak terbaca. Pastikan form memiliki enctype="multipart/form-data"');
             
         } catch (\Exception $e) {
-            // Jika ada error database atau sistem, pesan ini akan muncul
-            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -108,12 +112,12 @@ class SiswaController extends Controller
         $request->validate([
             'id_kategori' => 'required', 
             'id_lokasi' => 'required', 
-            'ket' => 'required'
+            'ket' => 'required',
+            'foto_kerusakan' => 'nullable|image|mimes:jpeg,png,jpg|max:10240'
         ]);
 
         $pengaduan = InputAspirasi::findOrFail($id);
         
-        // Proteksi agar siswa tidak bisa edit laporan orang lain
         if($pengaduan->nis != session('nis')) {
             return back()->with('error', 'Akses ditolak.');
         }
@@ -123,6 +127,10 @@ class SiswaController extends Controller
         $pengaduan->ket = $request->ket;
 
         if ($request->hasFile('foto_kerusakan')) {
+            // Hapus foto lama agar storage tidak penuh
+            if ($pengaduan->foto) {
+                Storage::disk('public')->delete($pengaduan->foto);
+            }
             $path = $request->file('foto_kerusakan')->store('aspirasi', 'public');
             $pengaduan->foto = $path;
         }
@@ -131,7 +139,6 @@ class SiswaController extends Controller
 
         $nama_lokasi = Lokasi::find($request->id_lokasi)->nama_lokasi ?? 'Lokasi tidak diketahui';
 
-        // CATAT LOG
         LogAktivitas::create([
             'nis' => session('nis'),
             'aktivitas' => 'Memperbarui data laporan di: ' . $nama_lokasi
@@ -143,18 +150,21 @@ class SiswaController extends Controller
     // 4. HAPUS LAPORAN (BATAL)
     public function destroyLapor($id) 
     {
-        $pengaduan = InputAspirasi::with('lokasi_relasi')->findOrFail($id);
+        $pengaduan = InputAspirasi::findOrFail($id);
         
         if($pengaduan->nis != session('nis')) {
             return back()->with('error', 'Akses ditolak.');
         }
 
-        // Ambil nama lokasi sebelum dihapus untuk log
-        $lokasi_lama = $pengaduan->lokasi_relasi->nama_lokasi ?? 'Lokasi tidak diketahui';
+        // Hapus file foto dari folder storage
+        if ($pengaduan->foto) {
+            Storage::disk('public')->delete($pengaduan->foto);
+        }
 
+        $lokasi_lama = Lokasi::find($pengaduan->id_lokasi)->nama_lokasi ?? 'Lokasi tidak diketahui';
+        
         $pengaduan->delete();
 
-        // CATAT LOG
         LogAktivitas::create([
             'nis' => session('nis'),
             'aktivitas' => 'Membatalkan/Menghapus laporan di: ' . $lokasi_lama

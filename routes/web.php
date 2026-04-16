@@ -23,7 +23,7 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 // CRUD Kategori
 Route::post('/admin/kategori', [AdminController::class, 'storeKategori']);
 Route::get('/admin/kategori/hapus/{id}', [AdminController::class, 'destroyKategori']);
-Route::post('/admin/kategori/update/{id}', [AdminController::class, 'updateKategori']);
+Route::post('/admin/kategori/update', [AdminController::class, 'updateKategori']);
 // CRUD Siswa
 Route::post('/admin/siswa', [AdminController::class, 'storeSiswa']);
 Route::get('/admin/siswa/hapus/{nis}', [AdminController::class, 'destroySiswa']);

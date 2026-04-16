@@ -615,52 +615,88 @@
 
     <script>
         $(document).ready(function() {
-            $('#tableLaporan').DataTable({
-                "pagingType": "full_numbers", // Mengaktifkan tombol First, Last, dan Numbers
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json",
-                    "search": "Cari Laporan:",
-                    "lengthMenu": "Tampilkan _MENU_ data",
-                    // Custom label untuk tombol navigasi
-                    "paginate": {
-                        "first": "««",    // Simbol <<
-                        "previous": "‹",   // Simbol <
-                        "next": "›",       // Simbol >
-                        "last": "»»"      // Simbol >>
-                    }
-                },
-                "pageLength": 10,
-                "order": [[3, 'desc']],
-                "columnDefs": [
-                    { "orderable": false, "targets": [0, 4] }
-                ]
-            });
+        $('#tableLaporan').DataTable({
+            "pagingType": "full_numbers",
+            "language": {
+                // GANTI BAGIAN URL DENGAN TEKS LANGSUNG SEPERTI INI:
+                "sEmptyTable":   "Tidak ada data yang tersedia pada tabel ini",
+                "sProcessing":   "Sedang memproses...",
+                "sLengthMenu":   "Tampilkan _MENU_ data",
+                "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                "sSearch":       "Cari Laporan:",
+                "paginate": {
+                    "first":    "««",
+                    "previous": "‹",
+                    "next":     "›",
+                    "last":     "»»"
+                }
+            },
+            "pageLength": 10,
+            "order": [[3, 'desc']],
+            "columnDefs": [
+                { "orderable": false, "targets": [0, 4] }
+            ]
         });
+    });
 
-        function confirmDelete(url, message) {
-            Swal.fire({
-                title: 'Konfirmasi',
-                text: message,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3b82f6',
-                cancelButtonColor: '#ef4444',
-                confirmButtonText: 'Ya, Hapus!',
-                background: '#0f172a',
-                color: '#ffffff'
-            }).then((result) => { if (result.isConfirmed) window.location.href = url; })
-        }
+    // Fungsi Konfirmasi Hapus
+    function confirmDelete(url, message) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            background: '#0f172a',
+            color: '#ffffff'
+        }).then((result) => { 
+            if (result.isConfirmed) {
+                window.location.href = url; 
+            }
+        })
+    }
 
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: "{{ session('success') }}",
-                background: '#0f172a',
-                color: '#ffffff',
-                confirmButtonColor: '#3b82f6'
-            });
-        @endif
-    </script>
+    // ALERT JIKA BERHASIL
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            background: '#0f172a',
+            color: '#ffffff',
+            confirmButtonColor: '#3b82f6'
+        });
+    @endif
+
+    // ALERT JIKA GAGAL HAPUS (Karena Kategori/Siswa/Lokasi masih dipakai)
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal Menghapus!',
+            text: "{{ session('error') }}",
+            background: '#0f172a',
+            color: '#ffffff',
+            confirmButtonColor: '#ef4444'
+        });
+    @endif
+
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Input Tidak Valid!',
+            // Menggabungkan semua pesan error menjadi satu string
+            text: "{!! implode(' ', $errors->all()) !!}", 
+            background: '#0f172a',
+            color: '#ffffff',
+            confirmButtonColor: '#ef4444'
+        });
+    @endif
+</script>
 </body>
 </html>
